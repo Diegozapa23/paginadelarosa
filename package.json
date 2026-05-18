@@ -1,0 +1,21 @@
+{
+  "name": "paginadelarosa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "uno.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mercadopago": "^2.12.0",
+    "nodemailer": "^8.0.7",
+    "transbank-sdk": "^6.1.1"
+  }
+}

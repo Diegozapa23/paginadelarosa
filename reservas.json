@@ -1,0 +1,20 @@
+[
+  {
+    "id": "1",
+    "nombre": "Diego",
+    "servicio": "Manicure",
+    "telefono": "123456",
+    "fecha": "26-03-42",
+    "hora": "12:00",
+    "pagado": true
+  },
+  {
+    "id": "2",
+    "nombre": "Catalina",
+    "servicio": "Pestañas",
+    "telefono": "987654321",
+    "fecha": "2026-05-14",
+    "hora": "16:00",
+    "pagado": true
+  }
+]

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Beauty Studio De La Rosa</title>
+  <link rel="stylesheet" href="uno.css" />
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <div class="small">BEAUTY STUDIO</div>
+      <div class="main">DE LA ROSA</div>
+      <div class="by">by Catalina</div>
+    </div>
+
+    <nav>
+      <a href="#inicio">INICIO</a>
+      <a href="#servicios">SERVICIOS</a>
+      <a href="#agenda">AGENDAR HORA</a>
+      <a href="#sobre-mi">SOBRE MÍ</a>
+      <a href="#contacto">CONTACTO</a>
+    </nav>
+
+    <a class="whatsapp" href="https://wa.me/56912345678" target="_blank">💬 ESCRÍBEME</a>
+  </header>
+
+  <section class="hero" id="inicio">
+    <div class="hero-content">
+      <div class="butterfly">♡</div>
+      <h5>BEAUTY STUDIO</h5>
+      <h1>DE LA ROSA</h1>
+      <div class="firma">by Catalina</div>
+      <div class="divider"></div>
+      <p>Realzamos tu belleza, potenciamos tu esencia.</p>
+      <a href="#agenda" class="btn">AGENDAR MI HORA</a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="main-grid">
+      <div class="services" id="servicios">
+        <div class="title">
+          <span>NUESTROS SERVICIOS</span>
+          <h2>Lo que hacemos por ti</h2>
+        </div>
+
+        <div class="service-grid">
+          <div class="service-card"><div class="icon">〰</div><h3>MICROPIGMENTACIÓN</h3><p>Cejas perfectas y naturales</p></div>
+          <div class="service-card"><div class="icon">◡</div><h3>EXTENSIONES DE PESTAÑAS</h3><p>Mirada intensa y definida</p></div>
+          <div class="service-card"><div class="icon">♡</div><h3>MAQUILLAJE</h3><p>Resalta tu belleza natural</p></div>
+          <div class="service-card"><div class="icon">✋</div><h3>MANICURE</h3><p>Uñas lindas, siempre</p></div>
+          <div class="service-card"><div class="icon">⌒</div><h3>PEDICURE</h3><p>Bienestar y belleza para tus pies</p></div>
+          <div class="service-card"><div class="icon">✧</div><h3>TRATAMIENTOS</h3><p>Cuidado facial y más</p></div>
+        </div>
+      </div>
+
+      <div class="booking" id="agenda">
+        <div class="title">
+          <span>AGENDA TU HORA</span>
+          <h2>Reserva tu momento</h2>
+        </div>
+
+        <form id="formReserva">
+          <input type="text" id="nombre" placeholder="Nombre completo" required>
+          <select id="servicio" required>
+            <option value="">Servicio</option>
+            <option>Micropigmentación</option>
+            <option>Extensiones de pestañas</option>
+            <option>Maquillaje</option>
+            <option>Manicure</option>
+            <option>Pedicure</option>
+            <option>Tratamiento facial</option>
+          </select>
+          <input type="tel" id="telefono" placeholder="Teléfono" required>
+          <input type="date" id="fecha" required>
+          <select class="full" id="hora" required>
+            <option value="">Hora</option>
+            <option>10:00</option>
+            <option>11:00</option>
+            <option>12:00</option>
+            <option>15:00</option>
+            <option>16:00</option>
+            <option>17:00</option>
+          </select>
+          <textarea id="comentario" placeholder="Comentario opcional"></textarea>
+          <button class="form-btn" type="submit">RESERVAR AHORA</button>
+        </form>
+
+        <p id="mensajeReserva"></p>
+      </div>
+    </div>
+
+    <div class="benefits">
+      <div class="benefit"><div class="icon">📅</div><div><h4>RESERVA FÁCIL</h4><p>Agenda online en pocos pasos</p></div></div>
+      <div class="benefit"><div class="icon">🕘</div><div><h4>HORARIOS FLEXIBLES</h4><p>Elige el mejor horario para ti</p></div></div>
+      <div class="benefit"><div class="icon">🔒</div><div><h4>PAGO 100% SEGURO</h4><p>Tus datos y pagos protegidos</p></div></div>
+      <div class="benefit"><div class="icon">♡</div><div><h4>ATENCIÓN PERSONALIZADA</h4><p>Te acompañamos en cada proceso</p></div></div>
+    </div>
+  </section>
+
+  <footer id="contacto">
+    Beauty Studio De La Rosa © 2026 — Todos los derechos reservados
+  </footer>
+
+  <script src="uno.js"></script>
+</body>
+</html>

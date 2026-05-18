@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Administrador</title>
+  <link rel="stylesheet" href="uno.css">
+
+  <style>
+    .admin-container {
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .admin-form {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .admin-form button {
+      grid-column: 1 / 4;
+      padding: 14px;
+      background: #d5a39d;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    th, td {
+      border: 1px solid #eee0de;
+      padding: 12px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f7e9e6;
+    }
+
+    .editar {
+      background: #d5a39d;
+      color: white;
+    }
+
+    .eliminar {
+      background: #c94d4d;
+      color: white;
+    }
+
+    .guardar {
+      background: #6ca96c;
+      color: white;
+    }
+
+    button {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 2px;
+    }
+
+    @media (max-width: 800px) {
+      .admin-form {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-form button {
+        grid-column: 1;
+      }
+
+      table {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+<script>
+if (localStorage.getItem("adminLogueado") !== "true") {
+  window.location.href = "login.html";
+}
+</script>
+
+<section class="section">
+  <div class="booking admin-container">
+
+    <div class="title">
+      <span>PANEL ADMIN</span>
+      <h2>Gestionar reservas</h2>
+    </div>
+
+    <form class="admin-form" id="formAdmin">
+      <input type="text" id="adminNombre" placeholder="Nombre cliente" required>
+      <input type="tel" id="adminTelefono" placeholder="Teléfono" required>
+
+      <select id="adminServicio" required>
+        <option value="">Servicio</option>
+        <option>Micropigmentación</option>
+        <option>Extensiones de pestañas</option>
+        <option>Maquillaje</option>
+        <option>Manicure</option>
+        <option>Pedicure</option>
+        <option>Tratamiento facial</option>
+      </select>
+
+      <input type="date" id="adminFecha" required>
+
+      <select id="adminHora" required>
+        <option value="">Hora</option>
+        <option>10:00</option>
+        <option>11:00</option>
+        <option>12:00</option>
+        <option>15:00</option>
+        <option>16:00</option>
+        <option>17:00</option>
+      </select>
+
+      <select id="adminPagado">
+        <option value="true">Pagado</option>
+        <option value="false">No pagado</option>
+      </select>
+
+      <button type="submit">AGREGAR RESERVA MANUAL</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Teléfono</th>
+          <th>Servicio</th>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Pagado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody id="tablaReservas"></tbody>
+    </table>
+
+  </div>
+</section>
+
+<script>
+const formAdmin = document.getElementById("formAdmin");
+const tabla = document.getElementById("tablaReservas");
+
+async function cargarReservas() {
+  const respuesta = await fetch("http://localhost:3000/reservas");
+  const reservas = await respuesta.json();
+
+  tabla.innerHTML = "";
+
+  reservas.forEach(reserva => {
+    tabla.innerHTML += `
+      <tr>
+        <td><input id="nombre-${reserva.id}" value="${reserva.nombre || ""}"></td>
+        <td><input id="telefono-${reserva.id}" value="${reserva.telefono || ""}"></td>
+        <td><input id="servicio-${reserva.id}" value="${reserva.servicio || ""}"></td>
+        <td><input type="date" id="fecha-${reserva.id}" value="${reserva.fecha || ""}"></td>
+        <td><input id="hora-${reserva.id}" value="${reserva.hora || ""}"></td>
+        <td>
+          <select id="pagado-${reserva.id}">
+            <option value="true" ${reserva.pagado ? "selected" : ""}>Sí</option>
+            <option value="false" ${!reserva.pagado ? "selected" : ""}>No</option>
+          </select>
+        </td>
+        <td>
+          <button class="guardar" onclick="guardarCambios('${reserva.id}')">Guardar</button>
+          <button class="eliminar" onclick="eliminarReserva('${reserva.id}')">Eliminar</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+formAdmin.addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const reserva = {
+    nombre: document.getElementById("adminNombre").value,
+    telefono: document.getElementById("adminTelefono").value,
+    servicio: document.getElementById("adminServicio").value,
+    fecha: document.getElementById("adminFecha").value,
+    hora: document.getElementById("adminHora").value,
+    pagado: document.getElementById("adminPagado").value === "true"
+  };
+
+  await fetch("http://localhost:3000/agregar-reserva", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(reserva)
+  });
+
+  formAdmin.reset();
+  cargarReservas();
+});
+
+async function guardarCambios(id) {
+  const datos = {
+    nombre: document.getElementById(`nombre-${id}`).value,
+    telefono: document.getElementById(`telefono-${id}`).value,
+    servicio: document.getElementById(`servicio-${id}`).value,
+    fecha: document.getElementById(`fecha-${id}`).value,
+    hora: document.getElementById(`hora-${id}`).value,
+    pagado: document.getElementById(`pagado-${id}`).value === "true"
+  };
+
+  await fetch(`http://localhost:3000/editar-reserva/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(datos)
+  });
+
+  alert("Reserva editada correctamente");
+  cargarReservas();
+}
+
+async function eliminarReserva(id) {
+  if (!confirm("¿Eliminar esta reserva?")) return;
+
+  await fetch(`http://localhost:3000/eliminar-reserva/${id}`, {
+    method: "DELETE"
+  });
+
+  cargarReservas();
+}
+
+cargarReservas();
+</script>
+
+</body>
+</html>

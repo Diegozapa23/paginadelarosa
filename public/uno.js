@@ -72,8 +72,6 @@
     });
   }
 
-  // si el video tarda mucho en arrancar, se completa el fallback
-  setTimeout(() => { if (!videoListo) cargarFallback(); }, 3000);
 
   function listoParaRevelar() {
     if (sinAnimacion) return paginaLista && (Date.now() - inicio) >= MIN_SIN_ANIM;

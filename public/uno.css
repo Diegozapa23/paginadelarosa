@@ -687,82 +687,130 @@ body.preloader-active .hero::before {
 
 .about-content-wrapper {
   display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 70px;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 60px;
   align-items: center;
-  text-align: left;
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 0 4%;
+}
+
+/* FOTOS: la grande + una instantanea desfasada */
+
+.about-media {
+  position: relative;
+  padding-bottom: 54px;
+  padding-right: 34px;
 }
 
 .about-image {
-  position: relative;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  opacity: 1;
-}
-
-.about-image::before {
-  content: "";
-  position: absolute;
-  width: 470px;
-  height: 640px;
   border-radius: 38px;
-  background:
-    linear-gradient(
-      to right,
-      #fffaf8 0%,
-      rgba(255,250,248,0.55) 10%,
-      rgba(255,250,248,0) 26%,
-      rgba(255,250,248,0) 74%,
-      rgba(255,250,248,0.55) 90%,
-      #fffaf8 100%
-    ),
-    linear-gradient(
-      to bottom,
-      #fffaf8 0%,
-      rgba(255,250,248,0.55) 10%,
-      rgba(255,250,248,0) 24%,
-      rgba(255,250,248,0) 76%,
-      rgba(255,250,248,0.55) 90%,
-      #fffaf8 100%
-    );
-  z-index: 2;
-  pointer-events: none;
+  overflow: hidden;
+  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.13);
 }
 
 .about-image img {
-  width: 450px;
-  height: 620px;
+  width: 100%;
+  height: 520px;
   object-fit: cover;
   object-position: center top;
-  border-radius: 38px;
   display: block;
-  box-shadow: 0 30px 65px rgba(0,0,0,0.08);
-  position: relative;
-  z-index: 1;
-  transition: transform 0.3s ease;
 }
 
-.about-image img:hover {
-  transform: scale(1.02);
+.about-snapshot {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 210px;
+  margin: 0;
+  transform: rotate(4deg);
+  border-radius: 18px;
+  overflow: hidden;
+  border: 6px solid #fffaf8;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
 }
+
+.about-snapshot img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  display: block;
+}
+
+/* TARJETA */
 
 .about-text {
-  max-width: 620px;
-  opacity: 1;
+  display: flex;
+  justify-content: center;
 }
 
-.about-text p {
-  font-size: 17px;
-  line-height: 1.9;
+.about-card {
+  background: #fffaf8;
+  border: 1px solid rgba(216, 201, 192, 0.5);
+  border-radius: 26px;
+  padding: 42px 40px 38px;
+  width: 100%;
+  max-width: 520px;
+}
+
+.about-lead {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 40px;
+  line-height: 1.05;
+  font-weight: 300;
+  color: #7a716d;
+  margin-bottom: 16px;
+}
+
+.about-lead em {
+  font-family: 'Allura', cursive;
+  font-style: normal;
+  font-size: 46px;
+  color: #b49a8e;
+}
+
+.about-about {
+  font-size: 15px;
+  line-height: 1.85;
   color: #5f5f5f;
-  margin-bottom: 22px;
+  margin-bottom: 26px;
+}
+
+/* CHIPS DE DATOS */
+
+.about-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 30px;
+}
+
+.about-fact {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  letter-spacing: 0.2px;
+  color: #6d615c;
+  background: #fff;
+  border: 1px solid rgba(216, 201, 192, 0.75);
+  border-radius: 999px;
+  padding: 9px 16px;
+}
+
+.about-fact b {
+  font-weight: 600;
+  color: #7a716d;
+}
+
+.about-fact i {
+  font-style: normal;
+  color: #c9b5ab;
+  font-size: 13px;
 }
 
 .about-btn {
   display: inline-block;
-  margin-top: 12px;
   background: linear-gradient(135deg, #857a73, #6f6660);
   color: white;
   padding: 15px 42px;
@@ -770,6 +818,7 @@ body.preloader-active .hero::before {
   text-decoration: none;
   font-weight: bold;
   letter-spacing: 1px;
+  font-size: 13px;
   transition: 0.3s ease;
 }
 
@@ -2595,3 +2644,56 @@ transition:.4s ease;
 
 }
 
+
+
+/* ============================================
+   SOBRE MI (movil)
+   ============================================ */
+
+@media (max-width: 767px) {
+  .about-content-wrapper {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 0 6%;
+  }
+
+  .about-media {
+    padding-bottom: 44px;
+    padding-right: 24px;
+  }
+
+  .about-image img {
+    height: 420px;
+  }
+
+  .about-snapshot {
+    width: 140px;
+  }
+
+  .about-snapshot img {
+    height: 175px;
+  }
+
+  .about-card {
+    padding: 32px 26px 30px;
+    border-radius: 22px;
+  }
+
+  .about-lead {
+    font-size: 32px;
+  }
+
+  .about-lead em {
+    font-size: 38px;
+  }
+
+  .about-about {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .about-fact {
+    font-size: 12px;
+    padding: 8px 13px;
+  }
+}

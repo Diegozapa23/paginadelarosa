@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: paginadelarosa
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      # URL publica del sitio (Khipu la necesita para el webhook).
+      # Render te da una como https://paginadelarosa.onrender.com
+      - key: SITIO_URL
+        sync: false
+      # Base de datos. En el plan gratis el disco es efimero:
+      # usa Neon (gratis) -> https://neon.tech  y pega la URL "pooled"
+      - key: DATABASE_URL
+        sync: false
+      # Panel de administracion
+      - key: ADMIN_USER
+        sync: false
+      - key: ADMIN_PASS
+        sync: false
+      # Khipu (pagos)
+      - key: KHIPU_API_KEY
+        sync: false
+      - key: KHIPU_SECRET
+        sync: false
+      - key: KHIPU_RECEIVER_ID
+        sync: false
+      - key: ANTICIPO_MONTO
+        value: "5000"

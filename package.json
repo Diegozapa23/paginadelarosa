@@ -1,21 +1,26 @@
 {
   "name": "paginadelarosa",
   "version": "1.0.0",
-  "description": "",
-  "main": "uno.js",
+  "description": "Sitio web y sistema de reservas para Beauty Studio De La Rosa",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
-  "keywords": [],
+  "keywords": [
+    "beauty",
+    "reservas"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
+    "compression": "^1.8.2",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "mercadopago": "^2.12.0",
-    "nodemailer": "^8.0.7",
-    "transbank-sdk": "^6.1.1"
+    "pg": "^8.23.0"
   }
 }

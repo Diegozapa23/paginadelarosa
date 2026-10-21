@@ -1,0 +1,11 @@
+node_modules
+.env
+reservas.json
+.vscode/
+preloader_frames/
+
+# archivos de trabajo (los videos definitivos viven en public/)
+*.blend
+*.blend1
+/preloader.webm
+/preloader.mp4

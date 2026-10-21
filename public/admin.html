@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <title>Panel Administrador - Beauty Studio De La Rosa</title>
+  <link rel="preload" href="fonts/allura-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/cormorant-garamond-var.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/montserrat-var.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="icon" href="favicon.ico" sizes="48x48" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow-x: hidden; }
+    body { font-family: 'Montserrat', sans-serif; background: #fffaf8; color: #4b4b4b; min-height: 100vh; }
+
+    /* PERMISO NOTIFICACIONES */
+    .notification-permission-banner {
+      background: linear-gradient(135deg, #d8c9c0, #c9b5ab);
+      color: white; padding: 16px 20px; text-align: center;
+      font-size: 13px; font-weight: 600; display: flex; align-items: center;
+      justify-content: center; gap: 12px; position: fixed; top: 0; width: 100%;
+      z-index: 1001; animation: slideDown 0.3s ease; overflow: hidden;
+    }
+    .notification-permission-banner button {
+      background: white; color: #d8c9c0; border: none; padding: 6px 14px;
+      border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 11px;
+      transition: 0.2s; flex-shrink: 0;
+    }
+    .notification-permission-banner button:hover { transform: scale(1.05); }
+    .notification-permission-banner .close-banner {
+      margin-left: auto; background: none; color: white; font-size: 18px; flex-shrink: 0;
+    }
+    @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+
+    /* HEADER */
+    .admin-header {
+      background: white; padding: 16px 5%;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100;
+      overflow: hidden;
+    }
+    .admin-header-logo { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 300; color: #7a716d; }
+    .admin-header-logo span { font-family: 'Allura', cursive; font-size: 20px; color: #d8c9c0; margin-left: 6px; }
+    .admin-badge { font-size: 9px; letter-spacing: 3px; color: #d8c9c0; font-weight: 600; }
+    .logout-btn {
+      background: none; border: 1px solid #d8c9c0; color: #7a716d;
+      padding: 8px 16px; border-radius: 8px; cursor: pointer; flex-shrink: 0;
+      font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1px; transition: 0.3s;
+    }
+    .logout-btn:hover { background: #d8c9c0; color: white; }
+
+    /* BODY */
+    .admin-body { max-width: 100%; margin: 0 auto; padding: 36px 5%; overflow: hidden; }
+
+    /* TABS */
+    .tabs {
+      display: flex; gap: 6px; margin-bottom: 28px;
+      border-bottom: 1px solid rgba(216,201,192,0.4); padding-bottom: 0; 
+      overflow-x: auto; overflow-y: hidden;
+      scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin; scrollbar-color: #d8c9c0 transparent;
+    }
+    .tabs::-webkit-scrollbar { height: 4px; }
+    .tabs::-webkit-scrollbar-track { background: transparent; }
+    .tabs::-webkit-scrollbar-thumb { background: #d8c9c0; border-radius: 2px; }
+    .tab-btn {
+      background: none; border: none; padding: 11px 16px;
+      font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600;
+      letter-spacing: 1px; color: #bbb; cursor: pointer;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+      transition: 0.3s; white-space: nowrap; flex-shrink: 0;
+    }
+    .tab-btn.active { color: #7a716d; border-bottom-color: #d8c9c0; }
+    .tab-btn:hover { color: #7a716d; }
+    .tab-content { display: none; width: 100%; overflow: hidden; }
+    .tab-content.active { display: block; }
+
+    /* CARD */
+    .admin-card {
+      background: white; border-radius: 24px; padding: 32px;
+      margin-bottom: 24px; border: 1px solid rgba(216,201,192,0.4);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.05); overflow: hidden;
+    }
+    .admin-card h2 {
+      font-family: 'Cormorant Garamond', serif; font-size: 26px;
+      font-weight: 300; color: #7a716d; margin-bottom: 22px; overflow-wrap: break-word;
+    }
+
+    /* STATS CARDS */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px;
+      width: 100%;
+    }
+    .stat-card {
+      background: white; border-radius: 20px; padding: 24px 20px;
+      border: 1px solid rgba(216,201,192,0.4); box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+      text-align: center; overflow: hidden;
+    }
+    .stat-icon { font-size: 32px; margin-bottom: 10px; display: block; }
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif; font-size: 42px;
+      font-weight: 300; color: #7a716d; line-height: 1; overflow-wrap: break-word;
+    }
+    .stat-label { font-size: 10px; letter-spacing: 2px; color: #d8c9c0; font-weight: 600; margin-top: 6px; }
+
+    /* CHARTS */
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
+    .chart-card {
+      background: white; border-radius: 20px; padding: 24px;
+      border: 1px solid rgba(216,201,192,0.4); box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+      overflow: hidden;
+    }
+    .chart-card h3 {
+      font-family: 'Cormorant Garamond', serif; font-size: 20px;
+      font-weight: 300; color: #7a716d; margin-bottom: 16px; overflow-wrap: break-word;
+    }
+    .chart-card canvas { max-height: 220px; max-width: 100%; }
+
+    /* CALENDARIO */
+    .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; gap: 10px; }
+    .cal-nav h3 { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 300; color: #7a716d; text-transform: capitalize; white-space: nowrap; }
+    .cal-arrow {
+      background: none; border: 1px solid rgba(216,201,192,0.8); border-radius: 50%;
+      width: 34px; height: 34px; cursor: pointer; font-size: 16px; color: #7a716d;
+      display: flex; align-items: center; justify-content: center; transition: 0.3s; flex-shrink: 0;
+    }
+    .cal-arrow:hover { background: #d8c9c0; color: white; border-color: #d8c9c0; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; width: 100%; }
+    .cal-day-name { text-align: center; font-size: 10px; letter-spacing: 1px; font-weight: 600; color: #d8c9c0; padding: 7px 0; overflow: hidden; }
+    .cal-day {
+      min-height: 66px; border-radius: 12px; padding: 7px 5px;
+      cursor: pointer; border: 1px solid transparent; transition: 0.2s; background: #fffaf8;
+      overflow: hidden; word-wrap: break-word;
+    }
+    .cal-day:hover { border-color: #d8c9c0; background: white; }
+    .cal-day.empty { background: transparent; cursor: default; border: none; }
+    .cal-day.today { border-color: #d8c9c0; background: white; }
+    .cal-day.selected { background: linear-gradient(135deg, #d8c9c0, #c9b5ab); border-color: transparent; }
+    .cal-day.selected .cal-day-num { color: white; }
+    .cal-day.selected .cal-dot { background: white; }
+    .cal-day.selected .cal-count { color: rgba(255,255,255,0.85); }
+    .cal-day.has-reservas { background: white; border-color: rgba(216,201,192,0.5); }
+    .cal-day-num { font-size: 13px; font-weight: 600; color: #7a716d; display: block; margin-bottom: 3px; overflow: hidden; }
+    .cal-day.today .cal-day-num { color: #c9b5ab; }
+    .cal-dots { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 3px; }
+    .cal-dot { width: 6px; height: 6px; border-radius: 50%; background: #d8c9c0; flex-shrink: 0; }
+    .cal-count { font-size: 10px; color: #d8c9c0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+
+    /* PANEL DÍA */
+    .day-panel { margin-top: 22px; display: none; overflow: hidden; }
+    .day-panel.visible { display: block; }
+    .day-panel-title {
+      font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300;
+      color: #7a716d; margin-bottom: 14px; padding-bottom: 12px;
+      border-bottom: 1px solid rgba(216,201,192,0.4); text-transform: capitalize; overflow-wrap: break-word;
+    }
+    .reserva-card {
+      background: #fffaf8; border: 1px solid rgba(216,201,192,0.5); border-radius: 16px;
+      padding: 16px 18px; margin-bottom: 10px;
+      display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; transition: 0.2s;
+      overflow: hidden;
+    }
+    .reserva-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+    .reserva-hora { font-size: 22px; font-family: 'Cormorant Garamond', serif; color: #d8c9c0; margin-bottom: 3px; overflow: hidden; }
+    .reserva-nombre { font-size: 14px; font-weight: 600; color: #7a716d; margin-bottom: 2px; overflow-wrap: break-word; }
+    .reserva-servicio { font-size: 12px; color: #999; overflow-wrap: break-word; }
+    .reserva-tel { font-size: 12px; color: #aaa; margin-top: 3px; overflow-wrap: break-word; }
+    .reserva-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; flex-shrink: 0; }
+    .badge-pagado { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+    .badge-si { background: #d5f4e6; color: #27ae60; }
+    .badge-no { background: #fadbd8; color: #c0392b; }
+    .btn-eliminar-small {
+      background: none; border: 1px solid #f0a0a0; color: #e07878;
+      padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: 600; transition: 0.2s; white-space: nowrap;
+    }
+    .btn-eliminar-small:hover { background: #f0a0a0; color: white; }
+    .btn-toggle-pago {
+      background: none; border: 1px solid rgba(216,201,192,0.8); color: #7a716d;
+      padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: 600;
+      transition: 0.2s; white-space: nowrap;
+    }
+    .btn-toggle-pago:hover { background: #d8c9c0; color: white; border-color: #d8c9c0; }
+    .btn-link-pago {
+      background: none; border: 1px solid #c9b5ab; color: #7a716d;
+      padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: 600;
+      transition: 0.2s; white-space: nowrap;
+    }
+    .btn-link-pago:hover { background: #c9b5ab; color: white; border-color: #c9b5ab; }
+    .empty-day { text-align: center; padding: 36px 20px; color: #ccc; font-size: 14px; overflow: hidden; }
+    .empty-day .icon { font-size: 30px; margin-bottom: 8px; display: block; }
+
+    /* FORMULARIO */
+    .admin-form { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; width: 100%; }
+    .admin-form input, .admin-form select {
+      width: 100%; padding: 12px 14px;
+      border: 1px solid rgba(216,201,192,0.8); border-radius: 10px;
+      background: #fffaf8; color: #4b4b4b;
+      font-family: 'Montserrat', sans-serif; font-size: 13px; outline: none; transition: 0.3s;
+      -webkit-appearance: none; appearance: none;
+    }
+    .admin-form input:focus, .admin-form select:focus {
+      border-color: #c9b5ab; background: white; box-shadow: 0 0 0 3px rgba(216,201,192,0.2);
+    }
+    .btn-agregar {
+      grid-column: 1 / 4; padding: 14px;
+      background: linear-gradient(135deg, #d8c9c0, #c9b5ab); color: white;
+      border: none; border-radius: 10px; cursor: pointer;
+      font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 2px; transition: 0.3s;
+    }
+    .btn-agregar:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(216,201,192,0.5); }
+    .admin-msg { margin-top: 14px; font-size: 13px; padding: 12px 16px; border-radius: 10px; display: none; overflow-wrap: break-word; }
+    .admin-msg.exito { display: block; background: #d5f4e6; color: #27ae60; border-left: 3px solid #27ae60; }
+    .admin-msg.error { display: block; background: #fadbd8; color: #c0392b; border-left: 3px solid #c0392b; }
+
+    /* TABLA */
+    .table-wrapper { overflow-x: auto; border-radius: 16px; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; background: white; border-radius: 16px; overflow: hidden; border: 1px solid rgba(216,201,192,0.3); }
+    thead tr { background: linear-gradient(135deg, #d8c9c0, #c9b5ab); }
+    th { padding: 14px 10px; color: white; font-size: 10px; letter-spacing: 2px; font-weight: 600; text-align: center; overflow-wrap: break-word; }
+    td { padding: 10px 8px; text-align: center; font-size: 12px; border-bottom: 1px solid rgba(216,201,192,0.2); color: #5f5f5f; overflow-wrap: break-word; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #fffaf8; }
+    td input, td select {
+      width: 100%; padding: 7px 8px; border: 1px solid rgba(216,201,192,0.6);
+      border-radius: 8px; background: #fffaf8;
+      font-family: 'Montserrat', sans-serif; font-size: 11px; color: #4b4b4b; outline: none; min-width: 80px;
+      -webkit-appearance: none; appearance: none;
+    }
+    .btn-guardar { background: #a8d5a2; color: white; border: none; padding: 6px 10px; border-radius: 7px; cursor: pointer; font-size: 10px; font-weight: 600; margin: 2px; transition: 0.2s; }
+    .btn-guardar:hover { background: #8bc484; }
+    .btn-eliminar { background: #f0a0a0; color: white; border: none; padding: 6px 10px; border-radius: 7px; cursor: pointer; font-size: 10px; font-weight: 600; margin: 2px; transition: 0.2s; }
+    .btn-eliminar:hover { background: #e07878; }
+    .empty-state { text-align: center; padding: 50px 20px; color: #aaa; font-size: 14px; overflow: hidden; }
+    .empty-state .icon { font-size: 36px; margin-bottom: 10px; display: block; }
+
+    /* ============================================ */
+    /* RESPONSIVE */
+    /* ============================================ */
+    @media (max-width: 1024px) {
+      .admin-body { padding: 24px 4%; }
+      .admin-card { padding: 24px 16px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .stat-card:last-child { grid-column: 1 / 3; }
+      .stat-num { font-size: 36px; }
+      .charts-grid { grid-template-columns: 1fr; }
+      .admin-form { grid-template-columns: repeat(2, 1fr); }
+      .btn-agregar { grid-column: 1 / 3; }
+    }
+
+    @media (max-width: 768px) {
+      .admin-header { padding: 12px 3%; }
+      .admin-header-logo { font-size: 18px; }
+      .admin-header-logo span { font-size: 16px; margin-left: 4px; }
+      .admin-badge { font-size: 8px; letter-spacing: 2px; }
+      .logout-btn { padding: 6px 12px; font-size: 10px; }
+      .notification-permission-banner { padding: 12px 10px; font-size: 12px; gap: 8px; }
+
+      .admin-body { padding: 16px 3%; }
+      .tabs { gap: 2px; margin-bottom: 20px; }
+      .tab-btn { padding: 9px 11px; font-size: 10px; }
+      .admin-card { padding: 16px 12px; margin-bottom: 16px; border-radius: 16px; }
+      .admin-card h2 { font-size: 20px; margin-bottom: 16px; }
+
+      .stats-grid { grid-template-columns: 1fr; gap: 12px; margin-bottom: 20px; }
+      .stat-card { padding: 18px 14px; border-radius: 16px; }
+      .stat-icon { font-size: 28px; margin-bottom: 8px; }
+      .stat-num { font-size: 32px; }
+      .stat-label { font-size: 9px; }
+
+      .charts-grid { gap: 14px; }
+      .chart-card { padding: 16px; border-radius: 16px; }
+      .chart-card h3 { font-size: 16px; margin-bottom: 12px; }
+      .chart-card canvas { max-height: 200px; }
+
+      .cal-nav h3 { font-size: 20px; }
+      .cal-arrow { width: 30px; height: 30px; font-size: 14px; }
+      .cal-grid { gap: 3px; }
+      .cal-day-name { font-size: 9px; padding: 5px 0; }
+      .cal-day { min-height: 56px; padding: 5px 3px; border-radius: 10px; }
+      .cal-day-num { font-size: 12px; margin-bottom: 2px; }
+      .cal-dot { width: 5px; height: 5px; }
+      .cal-count { font-size: 9px; }
+
+      .day-panel { margin-top: 16px; }
+      .day-panel-title { font-size: 18px; margin-bottom: 12px; padding-bottom: 10px; }
+      .reserva-card { padding: 14px; margin-bottom: 8px; gap: 10px; }
+      .reserva-hora { font-size: 18px; }
+      .reserva-nombre { font-size: 13px; }
+      .reserva-servicio { font-size: 11px; }
+      .reserva-tel { font-size: 11px; }
+      .reserva-actions { gap: 4px; }
+      .badge-pagado { padding: 3px 8px; font-size: 9px; }
+      .btn-eliminar-small { padding: 4px 8px; font-size: 10px; }
+      .btn-toggle-pago { padding: 4px 8px; font-size: 10px; }
+      .empty-day { padding: 24px 16px; font-size: 13px; }
+      .empty-day .icon { font-size: 28px; }
+
+      .admin-form { grid-template-columns: 1fr; gap: 10px; }
+      .admin-form input, .admin-form select { padding: 11px 12px; font-size: 14px; border-radius: 8px; }
+      .btn-agregar { grid-column: 1; padding: 12px; font-size: 11px; }
+      .admin-msg { margin-top: 10px; font-size: 12px; padding: 10px 12px; }
+
+      .table-wrapper table, .table-wrapper thead, .table-wrapper tbody,
+      .table-wrapper th, .table-wrapper td, .table-wrapper tr { display: block; }
+      .table-wrapper thead { display: none; }
+      .table-wrapper tbody tr {
+        background: white; border-radius: 12px; border: 1px solid rgba(216,201,192,0.4);
+        margin-bottom: 12px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      }
+      .table-wrapper td {
+        border: none; padding: 6px 0; text-align: left; font-size: 12px;
+        display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
+      }
+      .table-wrapper td::before {
+        content: attr(data-label); font-size: 9px; letter-spacing: 0.5px;
+        font-weight: 700; color: #d8c9c0; min-width: 65px; text-transform: uppercase; flex-shrink: 0;
+      }
+      .table-wrapper td input, .table-wrapper td select { flex: 1; min-width: 0; padding: 8px; font-size: 12px; }
+      .table-wrapper td:last-child {
+        border: none; padding: 8px 0; margin-top: 4px; margin-bottom: 0;
+        justify-content: flex-start; gap: 4px; flex-wrap: wrap;
+      }
+      .table-wrapper td:last-child::before { display: none; }
+      .btn-guardar { padding: 6px 8px; font-size: 9px; }
+      .btn-eliminar { padding: 6px 8px; font-size: 9px; }
+    }
+
+    @media (max-width: 480px) {
+      .admin-header { padding: 10px 2%; }
+      .admin-header-logo { font-size: 16px; }
+      .admin-header-logo span { font-size: 14px; margin-left: 2px; }
+      .admin-badge { font-size: 7px; letter-spacing: 1px; }
+      .logout-btn { padding: 5px 10px; font-size: 9px; }
+      .notification-permission-banner { padding: 10px 8px; font-size: 11px; }
+
+      .admin-body { padding: 12px 2%; max-width: 100%; }
+      .tabs { gap: 0; margin-bottom: 16px; }
+      .tab-btn { padding: 8px 10px; font-size: 9px; letter-spacing: 0.5px; }
+      .admin-card { padding: 12px 10px; margin-bottom: 12px; border-radius: 12px; }
+      .admin-card h2 { font-size: 18px; margin-bottom: 12px; }
+
+      .stats-grid { grid-template-columns: 1fr; gap: 10px; margin-bottom: 16px; }
+      .stat-card { padding: 14px 10px; border-radius: 12px; }
+      .stat-icon { font-size: 24px; margin-bottom: 6px; }
+      .stat-num { font-size: 28px; }
+      .stat-label { font-size: 8px; letter-spacing: 1px; }
+
+      .charts-grid { grid-template-columns: 1fr; gap: 10px; }
+      .chart-card { padding: 12px; border-radius: 12px; }
+      .chart-card h3 { font-size: 14px; margin-bottom: 10px; }
+      .chart-card canvas { max-height: 180px; }
+
+      .cal-nav { margin-bottom: 12px; gap: 6px; }
+      .cal-nav h3 { font-size: 16px; }
+      .cal-arrow { width: 28px; height: 28px; font-size: 13px; }
+      .cal-grid { gap: 2px; }
+      .cal-day-name { font-size: 8px; letter-spacing: 0; padding: 4px 0; }
+      .cal-day { min-height: 45px; padding: 4px 2px; border-radius: 8px; }
+      .cal-day-num { font-size: 10px; margin-bottom: 1px; }
+      .cal-dots { gap: 2px; margin-top: 2px; }
+      .cal-dot { width: 4px; height: 4px; }
+      .cal-count { font-size: 8px; }
+
+      .day-panel { margin-top: 12px; }
+      .day-panel-title { font-size: 16px; margin-bottom: 10px; padding-bottom: 8px; }
+      .reserva-card { padding: 12px; margin-bottom: 6px; grid-template-columns: 1fr; gap: 8px; }
+      .reserva-hora { font-size: 16px; }
+      .reserva-nombre { font-size: 12px; }
+      .reserva-servicio { font-size: 10px; }
+      .reserva-tel { font-size: 10px; }
+      .reserva-actions { gap: 4px; flex-direction: row; align-items: center; flex-wrap: wrap; }
+      .badge-pagado { padding: 2px 6px; font-size: 8px; }
+      .btn-eliminar-small { padding: 3px 6px; font-size: 9px; }
+      .btn-toggle-pago { padding: 3px 6px; font-size: 9px; }
+      .empty-day { padding: 20px 12px; font-size: 12px; }
+      .empty-day .icon { font-size: 26px; }
+
+      .admin-form { grid-template-columns: 1fr; gap: 8px; }
+      .admin-form input, .admin-form select { padding: 10px 10px; font-size: 14px; border-radius: 8px; }
+      .btn-agregar { grid-column: 1; padding: 11px; font-size: 10px; letter-spacing: 1px; }
+      .admin-msg { margin-top: 8px; font-size: 11px; padding: 8px 10px; }
+
+      .table-wrapper tbody tr { border-radius: 10px; padding: 10px; margin-bottom: 10px; }
+      .table-wrapper td { font-size: 11px; padding: 5px 0; gap: 4px; }
+      .table-wrapper td::before { font-size: 8px; min-width: 60px; }
+      .table-wrapper td input, .table-wrapper td select { padding: 7px; font-size: 11px; }
+      .btn-guardar { padding: 5px 6px; font-size: 8px; margin: 1px; }
+      .btn-eliminar { padding: 5px 6px; font-size: 8px; margin: 1px; }
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+      .btn-agregar, .btn-eliminar, .btn-guardar, .btn-toggle-pago, .btn-eliminar-small, .logout-btn, .cal-arrow {
+        padding: 10px 14px;
+        min-height: 44px;
+        min-width: 44px;
+      }
+      button { -webkit-appearance: none; appearance: none; }
+      input, select { -webkit-appearance: none; appearance: none; font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="notificationPermissionBanner" style="display: none;"></div>
+
+<header class="admin-header">
+  <div>
+    <div class="admin-badge">PANEL ADMINISTRADOR</div>
+    <div class="admin-header-logo">DE LA ROSA <span>by Catalina</span></div>
+  </div>
+  <button class="logout-btn" onclick="logout()">CERRAR SESIÓN</button>
+</header>
+
+<div class="admin-body">
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('calendario', this)">📅 CALENDARIO</button>
+    <button class="tab-btn" onclick="switchTab('estadisticas', this)">📊 ESTADÍSTICAS</button>
+    <button class="tab-btn" onclick="switchTab('lista', this)">📋 LISTA</button>
+    <button class="tab-btn" onclick="switchTab('agregar', this)">+ AGREGAR</button>
+  </div>
+
+  <!-- CALENDARIO -->
+  <div class="tab-content active" id="tab-calendario">
+    <div class="admin-card">
+      <div class="cal-nav">
+        <button class="cal-arrow" onclick="cambiarMes(-1)">&#8249;</button>
+        <h3 id="cal-titulo"></h3>
+        <button class="cal-arrow" onclick="cambiarMes(1)">&#8250;</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="day-panel" id="day-panel">
+        <div class="day-panel-title" id="day-panel-title"></div>
+        <div id="day-reservas"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ESTADÍSTICAS -->
+  <div class="tab-content" id="tab-estadisticas">
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-icon">📅</span>
+        <div class="stat-num" id="stat-reservas">0</div>
+        <div class="stat-label">RESERVAS ESTE MES</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">💰</span>
+        <div class="stat-num" id="stat-ventas">$0</div>
+        <div class="stat-label">INGRESOS ANTICIPOS</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">✨</span>
+        <div class="stat-num" id="stat-servicio">—</div>
+        <div class="stat-label">SERVICIO MÁS PEDIDO</div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3>Reservas por día</h3>
+        <canvas id="chartDias"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Servicios solicitados</h3>
+        <canvas id="chartServicios"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LISTA -->
+  <div class="tab-content" id="tab-lista">
+    <div class="admin-card">
+      <h2>Todas las reservas</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>CLIENTE</th><th>TELÉFONO</th><th>SERVICIO</th>
+              <th>FECHA</th><th>HORA</th><th>PAGADO</th><th>ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody id="tablaReservas"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- AGREGAR -->
+  <div class="tab-content" id="tab-agregar">
+    <div class="admin-card">
+      <h2>Agregar reserva manual</h2>
+      <form class="admin-form" id="formAdmin">
+        <input type="text" id="adminNombre" placeholder="Nombre cliente" required>
+        <input type="tel" id="adminTelefono" placeholder="Teléfono" required>
+        <select id="adminServicio" required>
+          <option value="">Servicio</option>
+          <option>Micropigmentación</option>
+          <option>Extensiones de pestañas</option>
+          <option>Maquillaje novia clásica</option>
+          <option>Maquillaje novia glam</option>
+          <option>Maquillaje social</option>
+          <option>Manicure</option>
+          <option>Pedicure</option>
+          <option>Tratamiento facial</option>
+        </select>
+        <input type="date" id="adminFecha" required>
+        <select id="adminHora" required>
+          <option value="">Hora</option>
+          <option>10:00</option><option>11:00</option><option>12:00</option>
+          <option>15:00</option><option>16:00</option><option>17:00</option>
+        </select>
+        <select id="adminPagado">
+          <option value="true">Pagado</option>
+          <option value="false">No pagado</option>
+        </select>
+        <button type="submit" class="btn-agregar">+ AGREGAR RESERVA</button>
+      </form>
+      <div id="adminMsg" class="admin-msg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ============================================
+  // PREVENIR SCROLL HORIZONTAL
+  // ============================================
+  document.addEventListener('touchmove', function(e) {
+    if (e.target.closest('.tabs') || e.target.closest('.table-wrapper')) {
+      return;
+    }
+    const touch = e.touches[0];
+    if (Math.abs(touch.clientX - (window.lastTouchX || touch.clientX)) > Math.abs(touch.clientY - (window.lastTouchY || touch.clientY))) {
+      e.preventDefault();
+    }
+    window.lastTouchX = touch.clientX;
+    window.lastTouchY = touch.clientY;
+  }, { passive: false });
+
+  // ============================================
+  // NOTIFICACIONES PUSH DEL NAVEGADOR
+  // ============================================
+  function requestNotificationPermission() {
+    if (!("Notification" in window)) {
+      console.log("Este navegador no soporta notificaciones");
+      return;
+    }
+
+    if (Notification.permission === "granted") {
+      console.log("Notificaciones ya están permitidas");
+      showPermissionBanner();
+      return;
+    }
+
+    if (Notification.permission !== "denied") {
+      showPermissionBanner();
+    }
+  }
+
+  function showPermissionBanner() {
+    const banner = document.getElementById("notificationPermissionBanner");
+    if (Notification.permission === "granted") {
+      banner.style.display = "none";
+      return;
+    }
+
+    banner.innerHTML = `
+      <div class="notification-permission-banner">
+        <span>🔔 Habilita notificaciones para recibir alertas de reservas</span>
+        <button onclick="enableNotifications()">Habilitar</button>
+        <button class="close-banner" onclick="this.parentElement.parentElement.style.display='none'">✕</button>
+      </div>
+    `;
+    banner.style.display = "block";
+  }
+
+  function enableNotifications() {
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          document.getElementById("notificationPermissionBanner").style.display = "none";
+          sendTestNotification("Notificaciones habilitadas ✓", "Ahora recibirás alertas de reservas");
+        }
+      });
+    }
+  }
+
+  function sendNotification(titulo, opciones = {}) {
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification(titulo, {
+        icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='80' fill='%23d8c9c0'>💄</text></svg>",
+        badge: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23d8c9c0'/></svg>",
+        tag: "beauty-studio",
+        requireInteraction: true,
+        ...opciones
+      });
+    }
+  }
+
+  function sendTestNotification(titulo, body) {
+    sendNotification(titulo, { body });
+  }
+
+  // ============================================
+  // AUTH
+  // ============================================
+  const auth = localStorage.getItem("adminAuth");
+  if (!auth) window.location.href = "login.html";
+
+  function headers() {
+    return { "Content-Type": "application/json", "Authorization": `Basic ${auth}` };
+  }
+
+  function logout() {
+    localStorage.removeItem("adminAuth");
+    window.location.href = "login.html";
+  }
+
+  // ============================================
+  // TABS
+  // ============================================
+  function switchTab(nombre, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tab-${nombre}`).classList.add('active');
+    btn.classList.add('active');
+    if (nombre === 'lista') renderTabla();
+    if (nombre === 'estadisticas') renderEstadisticas();
+  }
+
+  // ============================================
+  // DATOS
+  // ============================================
+  let todasLasReservas = [];
+  let mesActual = new Date().getMonth();
+  let anioActual = new Date().getFullYear();
+  let diaSeleccionado = null;
+  let chartDias = null;
+  let chartServicios = null;
+  let lastCheckDate = null;
+
+  async function cargarReservas() {
+    try {
+      const res = await fetch("/reservas", { headers: headers() });
+      if (res.status === 401) {
+        localStorage.removeItem("adminAuth");
+        window.location.href = "login.html";
+        return;
+      }
+      todasLasReservas = await res.json();
+      renderCalendario();
+      checkTodaysReservations();
+    } catch(e) { console.error(e); }
+  }
+
+  // ============================================
+  // NOTIFICACIONES DE HOY
+  // ============================================
+  function checkTodaysReservations() {
+    const hoy = new Date().toISOString().split('T')[0];
+    const currentCheck = new Date().toDateString();
+
+    if (lastCheckDate === currentCheck) return;
+    lastCheckDate = currentCheck;
+
+    const reservasHoy = todasLasReservas.filter(r => r.fecha === hoy).sort((a, b) => (a.hora || '').localeCompare(b.hora || ''));
+
+    if (reservasHoy.length === 0) {
+      sendNotification("📅 Beauty Studio", { body: "No hay reservas para hoy" });
+      return;
+    }
+
+    const horasPorServicio = {};
+    reservasHoy.forEach(r => {
+      if (!horasPorServicio[r.hora]) horasPorServicio[r.hora] = [];
+      horasPorServicio[r.hora].push(r.nombre);
+    });
+
+    const horasStr = Object.keys(horasPorServicio).sort().join(", ");
+    sendNotification(`📅 ${reservasHoy.length} Reserva${reservasHoy.length > 1 ? 's' : ''} hoy`, {
+      body: `Horas: ${horasStr}`,
+      tag: "reservas-hoy"
+    });
+
+    reservasHoy.forEach(r => {
+      sendNotification(`🕐 ${r.hora} - ${r.nombre}`, {
+        body: `${r.servicio}`,
+        tag: `reserva-${r.id}`
+      });
+    });
+  }
+
+  // ============================================
+  // CALENDARIO
+  // ============================================
+  const diasSemana = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  function cambiarMes(dir) {
+    mesActual += dir;
+    if (mesActual > 11) { mesActual = 0; anioActual++; }
+    if (mesActual < 0)  { mesActual = 11; anioActual--; }
+    diaSeleccionado = null;
+    document.getElementById('day-panel').classList.remove('visible');
+    renderCalendario();
+  }
+
+  function renderCalendario() {
+    document.getElementById('cal-titulo').textContent = `${meses[mesActual]} ${anioActual}`;
+    const grid = document.getElementById('cal-grid');
+    grid.innerHTML = '';
+
+    diasSemana.forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'cal-day-name';
+      el.textContent = d;
+      grid.appendChild(el);
+    });
+
+    const hoy = new Date();
+    const primerDia = new Date(anioActual, mesActual, 1);
+    let inicio = primerDia.getDay();
+    inicio = inicio === 0 ? 6 : inicio - 1;
+    const totalDias = new Date(anioActual, mesActual + 1, 0).getDate();
+
+    for (let i = 0; i < inicio; i++) {
+      const el = document.createElement('div');
+      el.className = 'cal-day empty';
+      grid.appendChild(el);
+    }
+
+    for (let d = 1; d <= totalDias; d++) {
+      const fechaStr = `${anioActual}-${String(mesActual+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const rdias = todasLasReservas.filter(r => r.fecha === fechaStr);
+      const el = document.createElement('div');
+      el.className = 'cal-day';
+      if (rdias.length > 0) el.classList.add('has-reservas');
+      if (d === hoy.getDate() && mesActual === hoy.getMonth() && anioActual === hoy.getFullYear()) el.classList.add('today');
+      if (diaSeleccionado === fechaStr) el.classList.add('selected');
+
+      el.innerHTML = `
+        <span class="cal-day-num">${d}</span>
+        ${rdias.length > 0 ? `
+          <div class="cal-dots">${rdias.slice(0,3).map(() => '<div class="cal-dot"></div>').join('')}</div>
+          <div class="cal-count">${rdias.length} reserva${rdias.length > 1 ? 's' : ''}</div>
+        ` : ''}`;
+      el.onclick = () => seleccionarDia(fechaStr);
+      grid.appendChild(el);
+    }
+  }
+
+  function seleccionarDia(fechaStr) {
+    diaSeleccionado = fechaStr;
+    renderCalendario();
+
+    const panel = document.getElementById('day-panel');
+    const titulo = document.getElementById('day-panel-title');
+    const contenido = document.getElementById('day-reservas');
+
+    const nombreDia = new Date(fechaStr + 'T12:00:00').toLocaleDateString('es-CL', {
+      weekday: 'long', day: 'numeric', month: 'long'
+    });
+    titulo.textContent = nombreDia;
+    panel.classList.add('visible');
+
+    const rdias = todasLasReservas.filter(r => r.fecha === fechaStr).sort((a,b) => (a.hora||'').localeCompare(b.hora||''));
+
+    if (rdias.length === 0) {
+      contenido.innerHTML = `<div class="empty-day"><span class="icon">🌸</span>Sin reservas para este día</div>`;
+      return;
+    }
+
+    contenido.innerHTML = rdias.map(r => `
+      <div class="reserva-card">
+        <div>
+          <div class="reserva-hora">${r.hora || '--:--'}</div>
+          <div class="reserva-nombre">${r.nombre || 'Sin nombre'}</div>
+          <div class="reserva-servicio">${r.servicio || ''}</div>
+          <div class="reserva-tel">📞 ${r.telefono || ''}</div>
+          ${r.payment_url ? `<div class="reserva-tel">🔗 <a href="${r.payment_url}" target="_blank" style="color:#c9b5ab;">Link de pago</a></div>` : ''}
+        </div>
+        <div class="reserva-actions">
+          <span class="badge-pagado ${r.pagado ? 'badge-si' : 'badge-no'}">${r.pagado ? '✓ Pagado' : (r.estado === 'pendiente_pago' ? '⏳ Pago pendiente' : '✗ No pagado')}</span>
+          <button class="btn-toggle-pago" onclick="togglePago('${r.id}', ${r.pagado}, '${fechaStr}')">
+            ${r.pagado ? 'Marcar no pagado' : 'Marcar pagado'}
+          </button>
+          ${r.payment_url ? `<button class="btn-link-pago" onclick="copiarLinkPago('${r.payment_url}')">Copiar link de pago</button>` : ''}
+          <button class="btn-eliminar-small" onclick="eliminarDia('${r.id}', '${fechaStr}')">Eliminar</button>
+        </div>
+      </div>`).join('');
+  }
+
+  async function togglePago(id, pagadoActual, fechaStr) {
+    try {
+      await fetch(`/editar-reserva/${id}`, { method: "PUT", headers: headers(), body: JSON.stringify({ pagado: !pagadoActual }) });
+      await cargarReservas();
+      seleccionarDia(fechaStr);
+    } catch(e) { alert("Error al actualizar."); }
+  }
+
+  async function eliminarDia(id, fechaStr) {
+    if (!confirm("¿Eliminar esta reserva?")) return;
+    try {
+      await fetch(`/eliminar-reserva/${id}`, { method: "DELETE", headers: headers() });
+      await cargarReservas();
+      seleccionarDia(fechaStr);
+    } catch(e) { alert("Error al eliminar."); }
+  }
+
+  async function copiarLinkPago(url) {
+    try {
+      await navigator.clipboard.writeText(url);
+      alert("Link de pago copiado. Envíalo por WhatsApp a tu clienta.");
+    } catch(e) {
+      prompt("Copia el link de pago:", url);
+    }
+  }
+
+  // ============================================
+  // ESTADÍSTICAS
+  // ============================================
+  function renderEstadisticas() {
+    const ahora = new Date();
+    const mes = ahora.getMonth();
+    const anio = ahora.getFullYear();
+
+    const delMes = todasLasReservas.filter(r => {
+      if (!r.fecha) return false;
+      const [y, m] = r.fecha.split('-').map(Number);
+      return y === anio && (m - 1) === mes;
+    });
+
+    document.getElementById('stat-reservas').textContent = delMes.length;
+    const ventas = delMes.filter(r => r.pagado).length * 5000;
+    document.getElementById('stat-ventas').textContent = `$${ventas.toLocaleString('es-CL')}`;
+
+    const conteoServicios = {};
+    delMes.forEach(r => { if (r.servicio) conteoServicios[r.servicio] = (conteoServicios[r.servicio] || 0) + 1; });
+    const topServicio = Object.entries(conteoServicios).sort((a,b) => b[1]-a[1])[0];
+    document.getElementById('stat-servicio').textContent = topServicio
+      ? topServicio[0].split(' ').slice(0,2).join(' ')
+      : '—';
+
+    const diasDelMes = new Date(anio, mes + 1, 0).getDate();
+    const reservasPorDia = Array(diasDelMes).fill(0);
+    delMes.forEach(r => {
+      const dia = parseInt(r.fecha?.split('-')[2]) - 1;
+      if (dia >= 0) reservasPorDia[dia]++;
+    });
+    const labelsDias = Array.from({length: diasDelMes}, (_, i) => i + 1);
+
+    if (chartDias) chartDias.destroy();
+    chartDias = new Chart(document.getElementById('chartDias'), {
+      type: 'bar',
+      data: {
+        labels: labelsDias,
+        datasets: [{
+          label: 'Reservas',
+          data: reservasPorDia,
+          backgroundColor: 'rgba(216,201,192,0.7)',
+          borderColor: '#c9b5ab',
+          borderWidth: 1,
+          borderRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(216,201,192,0.2)' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+
+    const labelsServ = Object.keys(conteoServicios);
+    const dataServ = Object.values(conteoServicios);
+    const colores = ['#d8c9c0','#c9b5ab','#e6cbc8','#b8a49c','#cfc0b7','#ddd0ca','#c0aca3'];
+
+    if (chartServicios) chartServicios.destroy();
+
+    if (labelsServ.length === 0) {
+      document.getElementById('chartServicios').parentElement.innerHTML += `<p style="text-align:center;color:#ccc;font-size:13px;margin-top:20px;">Sin datos este mes</p>`;
+      return;
+    }
+
+    chartServicios = new Chart(document.getElementById('chartServicios'), {
+      type: 'doughnut',
+      data: {
+        labels: labelsServ,
+        datasets: [{
+          data: dataServ,
+          backgroundColor: colores.slice(0, labelsServ.length),
+          borderWidth: 2,
+          borderColor: '#fffaf8'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { font: { family: 'Montserrat', size: 11 }, color: '#7a716d', padding: 14 }
+          }
+        }
+      }
+    });
+  }
+
+  // ============================================
+  // TABLA LISTA
+  // ============================================
+  function renderTabla() {
+    const tabla = document.getElementById('tablaReservas');
+    tabla.innerHTML = '';
+
+    if (todasLasReservas.length === 0) {
+      tabla.innerHTML = `<tr><td colspan="7"><div class="empty-state"><span class="icon">🌸</span>No hay reservas registradas.</div></td></tr>`;
+      return;
+    }
+
+    const ordenadas = [...todasLasReservas].sort((a,b) => {
+      if (a.fecha < b.fecha) return -1;
+      if (a.fecha > b.fecha) return 1;
+      return (a.hora||'').localeCompare(b.hora||'');
+    });
+
+    ordenadas.forEach(r => {
+      tabla.innerHTML += `
+        <tr>
+          <td data-label="Cliente"><input id="nombre-${r.id}" value="${r.nombre || ''}"></td>
+          <td data-label="Teléfono"><input id="telefono-${r.id}" value="${r.telefono || ''}"></td>
+          <td data-label="Servicio"><input id="servicio-${r.id}" value="${r.servicio || ''}"></td>
+          <td data-label="Fecha"><input type="date" id="fecha-${r.id}" value="${r.fecha || ''}"></td>
+          <td data-label="Hora"><input id="hora-${r.id}" value="${r.hora || ''}"></td>
+          <td data-label="Pagado">
+            <select id="pagado-${r.id}">
+              <option value="true" ${r.pagado ? 'selected' : ''}>Sí</option>
+              <option value="false" ${!r.pagado ? 'selected' : ''}>No</option>
+            </select>
+          </td>
+          <td>
+            ${r.payment_url ? `<button class="btn-link-pago" onclick="copiarLinkPago('${r.payment_url}')">Link</button>` : ''}
+            <button class="btn-guardar" onclick="guardar('${r.id}')">Guardar</button>
+            <button class="btn-eliminar" onclick="eliminarLista('${r.id}')">Eliminar</button>
+          </td>
+        </tr>`;
+    });
+  }
+
+  async function guardar(id) {
+    const datos = {
+      nombre: document.getElementById(`nombre-${id}`).value,
+      telefono: document.getElementById(`telefono-${id}`).value,
+      servicio: document.getElementById(`servicio-${id}`).value,
+      fecha: document.getElementById(`fecha-${id}`).value,
+      hora: document.getElementById(`hora-${id}`).value,
+      pagado: document.getElementById(`pagado-${id}`).value === 'true'
+    };
+    try {
+      await fetch(`/editar-reserva/${id}`, { method: "PUT", headers: headers(), body: JSON.stringify(datos) });
+      await cargarReservas();
+      renderTabla();
+    } catch(e) { alert("Error al guardar."); }
+  }
+
+  async function eliminarLista(id) {
+    if (!confirm("¿Eliminar esta reserva?")) return;
+    try {
+      await fetch(`/eliminar-reserva/${id}`, { method: "DELETE", headers: headers() });
+      await cargarReservas();
+      renderTabla();
+    } catch(e) { alert("Error al eliminar."); }
+  }
+
+  // ============================================
+  // AGREGAR
+  // ============================================
+  document.getElementById("formAdmin").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const msg = document.getElementById("adminMsg");
+    const reserva = {
+      nombre: document.getElementById("adminNombre").value,
+      telefono: document.getElementById("adminTelefono").value,
+      servicio: document.getElementById("adminServicio").value,
+      fecha: document.getElementById("adminFecha").value,
+      hora: document.getElementById("adminHora").value,
+      pagado: document.getElementById("adminPagado").value === "true"
+    };
+    try {
+      const res = await fetch("/agregar-reserva", { method: "POST", headers: headers(), body: JSON.stringify(reserva) });
+      if (res.ok) {
+        msg.className = "admin-msg exito";
+        msg.textContent = "Reserva agregada correctamente ✓";
+        this.reset();
+        await cargarReservas();
+        setTimeout(() => { msg.className = "admin-msg"; }, 3000);
+      }
+    } catch(e) {
+      msg.className = "admin-msg error";
+      msg.textContent = "Error al agregar la reserva.";
+    }
+  });
+
+  // ============================================
+  // INIT
+  // ============================================
+  requestNotificationPermission();
+  cargarReservas();
+</script>
+
+</body>
+</html>

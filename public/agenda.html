@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>Agendar - Beauty Studio De La Rosa</title>
+
+  <link rel="stylesheet" href="uno.css"/>
+  <link rel="preload" href="fonts/allura-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/cormorant-garamond-var.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/montserrat-var.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="icon" href="favicon.ico" sizes="48x48" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <div class="butterfly-logo">♡</div>
+    <div class="small">BEAUTY STUDIO</div>
+    <div class="main">DE LA ROSA</div>
+    <div class="by">by Catalina</div>
+  </div>
+
+  <nav>
+    <a href="uno.html">INICIO</a>
+    <a href="servicios.html">SERVICIOS</a>
+    <a href="agenda.html">AGENDAR</a>
+    <a href="contacto.html">CONTACTO</a>
+  </nav>
+
+  <a class="whatsapp" href="https://wa.me/56964670007" target="_blank">
+    💬 ESCRÍBEME
+  </a>
+
+  <div class="menu-toggle" id="menuToggle">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="uno.html">INICIO</a>
+    <a href="servicios.html">SERVICIOS</a>
+    <a href="agenda.html">AGENDAR</a>
+    <a href="contacto.html">CONTACTO</a>
+    <a class="whatsapp" href="https://wa.me/56964670007" target="_blank">
+      💬 ESCRÍBEME
+    </a>
+  </div>
+</header>
+
+<section class="booking-page">
+
+  <span class="section-subtitle">AGENDA TU HORA</span>
+  <h1>Reserva tu momento</h1>
+  <div class="section-divider"></div>
+
+  <p class="booking-intro">
+    Completa tus datos, selecciona el servicio que deseas y confirma tu reserva de forma fácil y segura.
+  </p>
+
+  <div class="booking-wrapper">
+
+    <form id="formReserva" class="booking-form">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nombre">✧ Nombre completo</label>
+          <input type="text" id="nombre" placeholder="Ej: Catalina Pérez" required />
+        </div>
+
+        <div class="form-group">
+          <label for="telefono">☏ Teléfono</label>
+          <input type="tel" id="telefono" placeholder="Ej: 912345678" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="servicio">❀ Servicio que deseas</label>
+        <select id="servicio" required>
+          <option value="">Selecciona un servicio</option>
+
+          <optgroup label="Uñas & Manicure">
+            <option>Esmaltado permanente</option>
+            <option>Capping / baño de gel</option>
+            <option>Nivelación</option>
+            <option>Poly Gel</option>
+            <option>Soft Gel</option>
+          </optgroup>
+
+          <optgroup label="Extensiones de Pestañas">
+            <option>Volumen tecnológico</option>
+            <option>Pestañas clásicas</option>
+          </optgroup>
+
+          <optgroup label="Diseño de Cejas">
+            <option>Laminación de cejas</option>
+            <option>Visagismo personalizado</option>
+          </optgroup>
+
+          <optgroup label="Maquillaje Profesional">
+            <option>Maquillaje social</option>
+            <option>Maquillaje novia clásica</option>
+            <option>Maquillaje para pieles involutivas</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fecha">♢ Fecha</label>
+          <input type="date" id="fecha" required />
+        </div>
+
+        <div class="form-group">
+          <label for="hora">⌚ Hora disponible</label>
+          <select id="hora" required>
+            <option value="">Selecciona una hora</option>
+            <option>10:00</option>
+            <option>11:00</option>
+            <option>12:00</option>
+            <option>15:00</option>
+            <option>16:00</option>
+            <option>17:00</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="comentario">✎ Comentario opcional</label>
+        <textarea id="comentario" placeholder="Puedes escribir si quieres algún diseño, retiro, alergia o detalle especial."></textarea>
+      </div>
+
+            <div class="booking-note">
+
+        <span>♡</span>
+
+        <p>
+          Para confirmar tu hora se solicita un anticipo
+          de <strong>$5.000</strong>, que se descuenta del valor
+          total de tu servicio.
+
+          <br><br>
+
+          Al enviar el formulario se abrirá una página
+          de pago seguro por transferencia bancaria.
+
+          <br><br>
+
+          El resto del servicio se paga al finalizar
+          tu atención en Beauty Studio De La Rosa.
+        </p>
+
+      </div>
+
+
+      <button class="form-btn" type="submit">
+        ♡ RESERVAR MI HORA
+      </button>
+
+      <p id="mensajeReserva" class="message"></p>
+
+    </form>
+
+  </div>
+
+</section>
+
+<footer>
+
+  <div class="footer-content">
+
+    <div class="footer-brand">
+
+      <img src="img/logo-wordmark.webp" alt="Beauty Studio De La Rosa" class="footer-logo" width="620" height="433" loading="lazy">
+
+      <div class="footer-divider"></div>
+
+      <p class="footer-description">
+        Realzamos tu belleza y potenciamos tu esencia ✨
+      </p>
+
+      <p class="footer-contact">
+        Pedro Riveros 1521 los jardines 2<br>
+        Valle Lo Campino, Quilicura
+      </p>
+
+      <p class="footer-contact">
+        +56 9 6467 0007
+      </p>
+
+      <a href="agenda.html" class="footer-agenda">
+        Reservar Hora
+      </a>
+
+    </div>
+
+    <div class="footer-center">
+
+      <div class="footer-box">
+        <h3>Menú del Sitio</h3>
+
+        <a href="servicios.html">Servicios</a>
+        <a href="agenda.html">Agendar</a>
+        <a href="contacto.html">Contacto</a>
+      </div>
+
+      <div class="footer-box">
+        <h3>Síguenos</h3>
+
+        <div class="footer-buttons">
+
+          <a class="social-icon"
+             href="https://wa.me/56964670007?text=Hola%20quiero%20mas%20informacion%20sobre%20tus%20servicios%20%E2%9D%A4%EF%B8%8F%F0%9F%8C%B9"
+             target="_blank">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp">
+          </a>
+
+          <a class="social-icon"
+             href="https://www.instagram.com/delarosa.studioo/"
+             target="_blank">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram">
+          </a>
+
+        </div>
+      </div>
+
+      <div class="footer-box">
+        <h3>Horario de Atención</h3>
+
+        <p>Lunes, Miércoles y Viernes</p>
+        <span>17:00 a 20:00</span>
+
+        <p>Martes y Jueves</p>
+        <span>10:00 a 21:00</span>
+
+        <p>Sábado</p>
+        <span>09:00 a 17:00</span>
+      </div>
+
+    </div>
+
+    <section class="map-section">
+
+      <h3>Nuestra Ubicación</h3>
+
+      <iframe
+        src="https://maps.google.com/maps?q=Pedro%20Riveros%201521,%208701594%20Valle%20Lo%20Campino,%20Quilicura,%20Regi%C3%B3n%20Metropolitana&t=h&z=18&ie=UTF8&iwloc=&output=embed"
+        loading="lazy">
+      </iframe>
+
+    </section>
+
+  </div>
+
+  <div class="footer-left">
+    Beauty Studio De La Rosa © 2026 Todos los derechos reservados
+  </div>
+
+</footer>
+
+<script src="uno.js"></script>
+<script src="agendar.js?v=10"></script>
+
+</body>
+</html>

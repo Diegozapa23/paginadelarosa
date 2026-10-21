@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>Confirmación de pago - Beauty Studio De La Rosa</title>
+
+  <link rel="stylesheet" href="uno.css"/>
+  <link rel="preload" href="fonts/allura-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/cormorant-garamond-var.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/montserrat-var.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="icon" href="favicon.ico" sizes="48x48" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <style>
+    .confirmation-status {
+      max-width: 620px;
+      margin: 0 auto;
+      background: white;
+      padding: 50px;
+      border-radius: 32px;
+      border: 1px solid rgba(216, 201, 192, 0.45);
+      box-shadow: 0 20px 55px rgba(0, 0, 0, 0.08);
+    }
+    .confirmation-icon {
+      font-size: 60px;
+      margin-bottom: 18px;
+      display: block;
+    }
+    .confirmation-icon.spinner {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto 22px;
+      border: 3px solid rgba(216, 201, 192, 0.3);
+      border-top-color: #d8c9c0;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    .confirmation-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 34px;
+      font-weight: 300;
+      color: #7a716d;
+      margin-bottom: 12px;
+    }
+    .confirmation-text {
+      color: #666;
+      font-size: 16px;
+      line-height: 1.8;
+      margin-bottom: 24px;
+    }
+    .confirmation-detail {
+      background: #fffaf8;
+      border: 1px solid rgba(216, 201, 192, 0.5);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 26px;
+      text-align: left;
+    }
+    .confirmation-detail p {
+      font-size: 14px;
+      color: #5f5f5f;
+      line-height: 1.9;
+      margin-bottom: 4px;
+    }
+    .confirmation-detail strong {
+      color: #7a716d;
+    }
+    .confirmation-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #d8c9c0, #c9b5ab);
+      color: white;
+      padding: 15px 40px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      letter-spacing: 1px;
+      font-size: 12px;
+      transition: 0.3s;
+    }
+    .confirmation-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(216, 201, 192, 0.5);
+    }
+    @media (max-width: 767px) {
+      .confirmation-status { padding: 32px 24px; }
+      .confirmation-title { font-size: 28px; }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <div class="butterfly-logo">♡</div>
+    <div class="small">BEAUTY STUDIO</div>
+    <div class="main">DE LA ROSA</div>
+    <div class="by">by Catalina</div>
+  </div>
+
+  <nav>
+    <a href="uno.html">INICIO</a>
+    <a href="servicios.html">SERVICIOS</a>
+    <a href="agenda.html">AGENDAR</a>
+    <a href="contacto.html">CONTACTO</a>
+  </nav>
+
+  <a class="whatsapp" href="https://wa.me/56964670007" target="_blank">
+    💬 ESCRÍBEME
+  </a>
+
+  <div class="menu-toggle" id="menuToggle">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="uno.html">INICIO</a>
+    <a href="servicios.html">SERVICIOS</a>
+    <a href="agenda.html">AGENDAR</a>
+    <a href="contacto.html">CONTACTO</a>
+    <a class="whatsapp" href="https://wa.me/56964670007" target="_blank">
+      💬 ESCRÍBEME
+    </a>
+  </div>
+</header>
+
+<section class="booking-page">
+
+  <span class="section-subtitle">PAGO</span>
+  <h1>Estado de tu reserva</h1>
+  <div class="section-divider"></div>
+
+  <div class="booking-wrapper">
+    <div class="confirmation-status" id="estadoPago">
+
+      <span class="confirmation-icon spinner"></span>
+      <div class="confirmation-title">Verificando tu pago...</div>
+      <p class="confirmation-text">
+        Espera unos segundos mientras confirmamos tu anticipo.
+        Si ya realizaste la transferencia, esto no demora.
+      </p>
+
+    </div>
+  </div>
+
+</section>
+
+<footer>
+
+  <div class="footer-content">
+
+    <div class="footer-brand">
+
+      <img src="img/logo-wordmark.webp" alt="Beauty Studio De La Rosa" class="footer-logo" width="620" height="433" loading="lazy">
+
+      <div class="footer-divider"></div>
+
+      <p class="footer-description">
+        Realzamos tu belleza y potenciamos tu esencia ✨
+      </p>
+
+      <p class="footer-contact">
+        Pedro Riveros 1521 los jardines 2<br>
+        Valle Lo Campino, Quilicura
+      </p>
+
+      <p class="footer-contact">
+        +56 9 6467 0007
+      </p>
+
+      <a href="agenda.html" class="footer-agenda">
+        Reservar Hora
+      </a>
+
+    </div>
+
+    <div class="footer-center">
+
+      <div class="footer-box">
+        <h3>Menú del Sitio</h3>
+
+        <a href="servicios.html">Servicios</a>
+        <a href="agenda.html">Agendar</a>
+        <a href="contacto.html">Contacto</a>
+      </div>
+
+      <div class="footer-box">
+        <h3>Síguenos</h3>
+
+        <div class="footer-buttons">
+
+          <a class="social-icon"
+             href="https://wa.me/56964670007?text=Hola%20quiero%20mas%20informacion%20sobre%20tus%20servicios%20%E2%9D%A4%EF%B8%8F%F0%9F%8C%B9"
+             target="_blank">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp">
+          </a>
+
+          <a class="social-icon"
+             href="https://www.instagram.com/delarosa.studioo/"
+             target="_blank">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram">
+          </a>
+
+        </div>
+      </div>
+
+      <div class="footer-box">
+        <h3>Horario de Atención</h3>
+
+        <p>Lunes, Miércoles y Viernes</p>
+        <span>17:00 a 20:00</span>
+
+        <p>Martes y Jueves</p>
+        <span>10:00 a 21:00</span>
+
+        <p>Sábado</p>
+        <span>09:00 a 17:00</span>
+      </div>
+
+    </div>
+
+    <section class="map-section">
+
+      <h3>Nuestra Ubicación</h3>
+
+      <iframe
+        src="https://maps.google.com/maps?q=Pedro%20Riveros%201521,%208701594%20Valle%20Lo%20Campino,%20Quilicura,%20Regi%C3%B3n%20Metropolitana&t=h&z=18&ie=UTF8&iwloc=&output=embed"
+        loading="lazy">
+      </iframe>
+
+    </section>
+
+  </div>
+
+  <div class="footer-left">
+    Beauty Studio De La Rosa © 2026 Todos los derechos reservados
+  </div>
+
+</footer>
+
+<script src="uno.js"></script>
+<script>
+  // ============================================
+  // VERIFICACIÓN DE PAGO
+  // ============================================
+
+  const params = new URLSearchParams(window.location.search);
+  const reservaId = params.get("reserva");
+
+  const estadoPago = document.getElementById("estadoPago");
+
+  function formatearFecha(iso) {
+    if (!iso) return "";
+    const f = new Date(iso + "T12:00:00");
+    return f.toLocaleDateString("es-CL", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  }
+
+  function mostrarPagado(r) {
+    estadoPago.innerHTML = `
+      <span class="confirmation-icon">💖</span>
+      <div class="confirmation-title">¡Reserva confirmada!</div>
+      <p class="confirmation-text">
+        Recibimos tu anticipo. Tu hora queda reservada y esperamos tu visita.
+      </p>
+      <div class="confirmation-detail">
+        <p><strong>Servicio:</strong> ${r.servicio}</p>
+        <p><strong>Fecha:</strong> ${formatearFecha(r.fecha)}</p>
+        <p><strong>Hora:</strong> ${r.hora}</p>
+        <p><strong>A nombre de:</strong> ${r.nombre}</p>
+      </div>
+      <a class="confirmation-btn" href="uno.html">Volver al inicio</a>
+    `;
+  }
+
+  function mostrarPendiente() {
+    estadoPago.innerHTML = `
+      <span class="confirmation-icon">⏳</span>
+      <div class="confirmation-title">Tu reserva sigue pendiente</div>
+      <p class="confirmation-text">
+        Aún no registramos el pago del anticipo.
+        Si no pudiste completarlo, puedes hacerlo más tarde o escribirnos por WhatsApp.
+      </p>
+      <a class="confirmation-btn" href="https://wa.me/56964670007" target="_blank">Escribir por WhatsApp</a>
+    `;
+  }
+
+  async function consultarEstado() {
+    if (!reservaId) {
+      estadoPago.innerHTML = `
+        <span class="confirmation-icon">❓</span>
+        <div class="confirmation-title">Datos de pago no encontrados</div>
+        <p class="confirmation-text">Revisa el enlace que recibiste e inténtalo nuevamente.</p>
+        <a class="confirmation-btn" href="agenda.html">Agendar hora</a>
+      `;
+      return;
+    }
+
+    try {
+      const respuesta = await fetch(`/estado-reserva/${encodeURIComponent(reservaId)}`);
+      const data = await respuesta.json();
+
+      if (data.error) {
+        mostrarPendiente();
+        return;
+      }
+
+      if (data.pagado) {
+        mostrarPagado(data);
+        return;
+      }
+
+      // Sigue pendiente: reintenta en unos segundos
+      setTimeout(consultarEstado, 5000);
+    } catch (error) {
+      setTimeout(consultarEstado, 5000);
+    }
+  }
+
+  consultarEstado();
+</script>
+
+</body>
+</html>

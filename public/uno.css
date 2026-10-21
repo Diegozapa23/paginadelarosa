@@ -780,53 +780,64 @@ body.preloader-active .hero::before {
 
 
 /* ============================================
-   LO QUE ME GUSTA
+   LO QUE ME GUSTA (banda taupe)
    ============================================ */
 
 .personal {
-  padding: 110px 8%;
-  background: #fffaf8;
+  padding: 100px 8%;
+  background: linear-gradient(135deg, #d8c9c0 0%, #c9b5ab 100%);
   text-align: center;
+}
+
+.personal-header .section-subtitle {
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .personal-header h2 {
   font-family: 'Cormorant Garamond', serif;
   font-size: 58px;
   font-weight: 300;
-  color: #7a716d;
+  color: #fff;
   margin-bottom: 6px;
+}
+
+.personal-header .section-divider {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.personal-header .section-divider::after {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .personal-wrapper {
   display: grid;
-  grid-template-columns: 1fr 1.1fr;
-  gap: 64px;
+  grid-template-columns: 1fr 1.05fr;
+  gap: 70px;
   align-items: center;
   max-width: 1080px;
-  margin: 70px auto 0;
+  margin: 64px auto 0;
   text-align: left;
 }
 
 .personal-image {
   position: relative;
   width: 100%;
-  max-width: 430px;
+  max-width: 400px;
   justify-self: center;
 }
 
 .personal-image::before {
   content: "";
   position: absolute;
-  inset: 26px -26px -26px 26px;
-  border-radius: 38px;
+  inset: 24px -24px -24px 24px;
+  border-radius: 30px;
   background: linear-gradient(
     to right,
-    #fffaf8 0%,
-    rgba(255, 250, 248, 0.5) 12%,
-    rgba(255, 250, 248, 0) 30%,
-    rgba(255, 250, 248, 0) 70%,
-    rgba(255, 250, 248, 0.45) 88%,
-    #fffaf8 100%
+    rgba(255, 250, 248, 0.75) 0%,
+    rgba(255, 250, 248, 0) 34%,
+    rgba(255, 250, 248, 0) 66%,
+    rgba(255, 250, 248, 0.6) 100%
   );
   z-index: 0;
 }
@@ -835,25 +846,32 @@ body.preloader-active .hero::before {
   position: relative;
   z-index: 1;
   width: 100%;
-  border-radius: 38px;
+  border-radius: 30px;
   display: block;
-  box-shadow: 0 30px 65px rgba(0, 0, 0, 0.09);
+  box-shadow: 0 30px 60px rgba(90, 70, 60, 0.28);
 }
 
 .personal-text p {
   font-size: 17px;
   line-height: 1.9;
-  color: #5f5f5f;
+  color: rgba(255, 255, 255, 0.94);
   margin-bottom: 18px;
 }
 
 .personal-text .about-btn {
-  margin-top: 10px;
+  margin-top: 12px;
+  background: #fffaf8;
+  color: #7a716d;
+  box-shadow: 0 12px 26px rgba(90, 70, 60, 0.18);
+}
+
+.personal-text .about-btn:hover {
+  background: #fff;
 }
 
 @media (max-width: 767px) {
   .personal {
-    padding: 80px 6%;
+    padding: 72px 6%;
   }
 
   .personal-header h2 {
@@ -862,17 +880,17 @@ body.preloader-active .hero::before {
 
   .personal-wrapper {
     grid-template-columns: 1fr;
-    gap: 36px;
-    margin-top: 44px;
+    gap: 34px;
+    margin-top: 40px;
     text-align: center;
   }
 
   .personal-image {
-    max-width: 340px;
+    max-width: 320px;
   }
 
   .personal-image::before {
-    inset: 18px -18px -18px 18px;
+    inset: 16px -16px -16px 16px;
   }
 
   .personal-text p {

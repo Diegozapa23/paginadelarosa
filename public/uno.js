@@ -103,31 +103,34 @@
 })();
 
 // ============================================
-// ROTACION DE FOTOS (seccion "Quien soy")
+// FOTOS QUE SE ALTERNAN (seccion "Quien soy")
 // ============================================
 
 (function () {
-  const fotos = Array.from(document.querySelectorAll('.about-foto'));
-  if (fotos.length < 2) return;
+  const columnas = Array.from(document.querySelectorAll('.about-media'));
+  if (!columnas.length) return;
 
   const CADA_MS = 4500;
-  let actual = 0;
+  let turno = 0;
   let timer = null;
 
-  function mostrar(indice) {
-    actual = indice % fotos.length;
-    fotos.forEach((f, i) => f.classList.toggle('is-active', i === actual));
+  function pintar() {
+    // la foto activa de la izquierda pasa a la derecha y al reves
+    columnas.forEach((col, c) => {
+      const fotos = Array.from(col.querySelectorAll('.about-foto'));
+      fotos.forEach((f, i) => f.classList.toggle('is-active', i === (turno + c) % fotos.length));
+    });
   }
 
   function arrancar() {
     if (timer) clearInterval(timer);
-    timer = setInterval(() => mostrar(actual + 1), CADA_MS);
+    timer = setInterval(() => { turno++; pintar(); }, CADA_MS);
   }
 
-  mostrar(0);
+  pintar();
   arrancar();
 
-  const zona = document.querySelector('.about') || fotos[0];
+  const zona = document.querySelector('.about') || columnas[0];
   zona.addEventListener('mouseenter', () => clearInterval(timer));
   zona.addEventListener('mouseleave', arrancar);
 })();

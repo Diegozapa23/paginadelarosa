@@ -883,28 +883,38 @@ body.preloader-active .hero::before {
 
 
 /* ============================================
-   ROTACION DE FOTOS + DATOS ORDENADOS
+   SOBRE MI: fotos a los lados + texto al medio
    ============================================ */
 
-.about-image {
+.about-content-wrapper {
   display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  gap: 46px;
+  align-items: center;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 4%;
+}
+
+.about-media {
+  position: relative;
   width: 100%;
-  max-width: 470px;
+  max-width: 320px;
   margin: 0 auto;
 }
 
 .about-foto {
   grid-area: 1 / 1;
   width: 100%;
-  height: 562px;
+  height: 430px;
   object-fit: cover;
   object-position: center top;
-  border-radius: 38px;
+  border-radius: 34px;
   display: block;
-  box-shadow: 0 30px 65px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 26px 58px rgba(0, 0, 0, 0.09);
   opacity: 0;
-  transform: scale(1.02);
-  transition: opacity 1s ease, transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: scale(1.03);
+  transition: opacity 1.1s ease, transform 1.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .about-foto.is-active {
@@ -912,61 +922,55 @@ body.preloader-active .hero::before {
   transform: scale(1);
 }
 
-/* datos en lista */
-
-.about-hello {
-  font-size: 17px;
-  line-height: 1.9;
-  color: #5f5f5f;
-  margin-bottom: 22px;
-}
-
-.about-facts {
-  list-style: none;
-  margin: 0 0 26px;
-  padding: 0;
-  display: grid;
-  gap: 11px;
-}
-
-.about-facts li {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 16px;
-  line-height: 1.5;
-  color: #5f5f5f;
-}
-
-.about-facts i {
-  font-style: normal;
-  font-size: 17px;
-  color: #c9b5ab;
-  width: 22px;
+.about-text {
   text-align: center;
-  flex-shrink: 0;
 }
 
-.about-text .about-close {
+.about-text p {
   font-size: 17px;
   line-height: 1.9;
   color: #5f5f5f;
-  margin-bottom: 24px;
+  margin-bottom: 18px;
+}
+
+.about-text .about-btn {
+  margin-top: 8px;
+}
+
+@media (max-width: 900px) {
+  .about-content-wrapper {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .about-text {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .about-media {
+    max-width: 280px;
+  }
+
+  .about-foto {
+    height: 380px;
+  }
 }
 
 @media (max-width: 767px) {
-  .about-foto {
-    height: 480px;
+  .about-content-wrapper {
+    gap: 14px;
+    padding: 0 5%;
   }
 
-  .about-hello,
-  .about-text .about-close {
+  .about-foto {
+    height: 280px;
+    border-radius: 24px;
+  }
+
+  .about-text p {
     font-size: 15px;
     line-height: 1.85;
-  }
-
-  .about-facts li {
-    font-size: 14.5px;
   }
 }
 

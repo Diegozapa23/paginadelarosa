@@ -115,21 +115,12 @@
   const columnas = Array.from(document.querySelectorAll('.about-media'));
   if (!columnas.length) return;
 
-  const CADA_MS = 4500;
-  let turno = 0;
-  let timer = null;
-
   function pintar() {
-    // la foto activa de la izquierda pasa a la derecha y al reves
+    // cada columna mantiene su foto fija, sin intercambiarse de lado
     columnas.forEach((col, c) => {
       const fotos = Array.from(col.querySelectorAll('.about-foto'));
-      fotos.forEach((f, i) => f.classList.toggle('is-active', i === (turno + c) % fotos.length));
+      fotos.forEach((f, i) => f.classList.toggle('is-active', i === c % fotos.length));
     });
-  }
-
-  function arrancar() {
-    if (timer) clearInterval(timer);
-    timer = setInterval(() => { turno++; pintar(); }, CADA_MS);
   }
 
   if (window.matchMedia('(max-width: 767px)').matches) {
@@ -157,11 +148,6 @@
   }
 
   pintar();
-  arrancar();
-
-  const zona = document.querySelector('.about') || columnas[0];
-  zona.addEventListener('mouseenter', () => clearInterval(timer));
-  zona.addEventListener('mouseleave', arrancar);
 })();
 
 // ============================================

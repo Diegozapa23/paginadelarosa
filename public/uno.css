@@ -898,6 +898,7 @@ body.preloader-active .hero::before {
 
 .about-media {
   position: relative;
+  display: grid;
   width: 100%;
   max-width: 320px;
   margin: 0 auto;

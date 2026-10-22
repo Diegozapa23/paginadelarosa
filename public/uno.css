@@ -938,29 +938,63 @@ body.preloader-active .hero::before {
 }
 
 @media (max-width: 900px) {
+  /* la misma composicion que en escritorio: foto | texto | foto,
+     pero deslizable para que las fotos se vean grandes y legibles */
   .about-content-wrapper {
-    display: block;
-    max-width: 560px;
+    display: flex;
+    align-items: stretch;
+    gap: 16px;
+    max-width: none;
+    padding: 0 5%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
 
-  .about-media-izq {
-    width: 100%;
-    max-width: 340px;
-    margin: 0 auto 34px;
-  }
-
-  .about-media-der {
+  .about-content-wrapper::-webkit-scrollbar {
     display: none;
   }
 
-  .about-foto {
-    height: 425px;
+  .about-media {
+    flex: 0 0 58%;
+    max-width: none;
+    margin: 0;
+  }
+
+  .about-media-der {
+    order: 3;
   }
 
   .about-text {
-    text-align: center;
+    order: 2;
+    flex: 0 0 78%;
+    text-align: left;
+    align-self: center;
+  }
+
+  .about-foto {
+    height: 340px;
+  }
+
+  /* pista de que la tira se desliza */
+  .about {
+    position: relative;
+  }
+
+  .about::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 46px;
+    background: linear-gradient(to right, rgba(255, 250, 248, 0), #fffaf8 78%);
+    pointer-events: none;
+    z-index: 5;
   }
 }
+
 
 
 @media (max-width: 767px) {
@@ -970,13 +1004,21 @@ body.preloader-active .hero::before {
   }
 
   .about-foto {
-    height: 380px;
-    border-radius: 26px;
+    height: 300px;
+    border-radius: 24px;
   }
 
-  .about-media-izq {
-    max-width: 300px;
-    margin-bottom: 28px;
+  .about-content-wrapper {
+    gap: 12px;
+    padding: 0 4%;
+  }
+
+  .about-media {
+    flex: 0 0 62%;
+  }
+
+  .about-text {
+    flex: 0 0 84%;
   }
 
   .about-text p {

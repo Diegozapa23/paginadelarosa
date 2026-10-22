@@ -888,7 +888,7 @@ body.preloader-active .hero::before {
 
 .about-content-wrapper {
   display: grid;
-  grid-template-columns: 1fr 1.15fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, 1fr);
   gap: 46px;
   align-items: center;
   max-width: 1180px;
@@ -939,23 +939,29 @@ body.preloader-active .hero::before {
 
 @media (max-width: 900px) {
   .about-content-wrapper {
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
+    display: block;
+    max-width: 560px;
   }
 
-  .about-text {
-    grid-column: 1 / -1;
-    grid-row: 2;
+  .about-media-izq {
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto 34px;
   }
 
-  .about-media {
-    max-width: 280px;
+  .about-media-der {
+    display: none;
   }
 
   .about-foto {
-    height: 380px;
+    height: 425px;
+  }
+
+  .about-text {
+    text-align: center;
   }
 }
+
 
 @media (max-width: 767px) {
   .about-content-wrapper {
@@ -964,8 +970,13 @@ body.preloader-active .hero::before {
   }
 
   .about-foto {
-    height: 280px;
-    border-radius: 24px;
+    height: 380px;
+    border-radius: 26px;
+  }
+
+  .about-media-izq {
+    max-width: 300px;
+    margin-bottom: 28px;
   }
 
   .about-text p {

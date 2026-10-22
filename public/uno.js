@@ -127,6 +127,17 @@
     timer = setInterval(() => { turno++; pintar(); }, CADA_MS);
   }
 
+  if (window.matchMedia('(max-width: 767px)').matches) {
+    const fotos = Array.from(document.querySelectorAll('.about-media-izq .about-foto'));
+    if (fotos.length > 1) {
+      fotos.forEach((f, i) => f.classList.toggle('is-active', i === 0));
+      setTimeout(() => {
+        fotos.forEach((f, i) => f.classList.toggle('is-active', i === fotos.length - 1));
+      }, 3000);
+    }
+    return;
+  }
+
   pintar();
   arrancar();
 

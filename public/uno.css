@@ -2865,12 +2865,13 @@ transition:.4s ease;
   }
 
   .about-media-izq {
-    align-self: flex-start;
+    align-self: center;
+    width: 100%;
+    margin: 0 auto;
   }
 
   .about-media-der {
-    display: grid;
-    align-self: flex-end;
+    display: none;
   }
 
   .about-foto {

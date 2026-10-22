@@ -883,73 +883,90 @@ body.preloader-active .hero::before {
 
 
 /* ============================================
-   ROTACION DE DATOS (seccion "Quien soy")
+   ROTACION DE FOTOS + DATOS ORDENADOS
    ============================================ */
 
-.about-rotate {
+.about-image {
   display: grid;
-  margin-bottom: 20px;
-  min-height: 132px;
-  align-content: start;
+  width: 100%;
+  max-width: 470px;
+  margin: 0 auto;
 }
 
-.about-rotate p {
+.about-foto {
   grid-area: 1 / 1;
-  margin: 0;
+  width: 100%;
+  height: 562px;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 38px;
+  display: block;
+  box-shadow: 0 30px 65px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  transform: scale(1.02);
+  transition: opacity 1s ease, transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.about-foto.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* datos en lista */
+
+.about-hello {
   font-size: 17px;
   line-height: 1.9;
   color: #5f5f5f;
-  opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 0.9s ease, transform 0.9s ease;
-  pointer-events: none;
+  margin-bottom: 22px;
 }
 
-.about-rotate p.is-active {
-  opacity: 1;
-  transform: translateY(0);
+.about-facts {
+  list-style: none;
+  margin: 0 0 26px;
+  padding: 0;
+  display: grid;
+  gap: 11px;
 }
 
-.about-dots {
+.about-facts li {
   display: flex;
-  gap: 8px;
-  margin-bottom: 26px;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #5f5f5f;
 }
 
-.about-dots span {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(216, 201, 192, 0.55);
-  transition: background 0.5s ease, transform 0.5s ease;
-}
-
-.about-dots span.is-active {
-  background: #b49a8e;
-  transform: scale(1.25);
+.about-facts i {
+  font-style: normal;
+  font-size: 17px;
+  color: #c9b5ab;
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 .about-text .about-close {
   font-size: 17px;
   line-height: 1.9;
   color: #5f5f5f;
-  margin-bottom: 18px;
+  margin-bottom: 24px;
 }
 
 @media (max-width: 767px) {
-  .about-rotate {
-    min-height: 108px;
+  .about-foto {
+    height: 480px;
   }
 
-  .about-rotate p,
+  .about-hello,
   .about-text .about-close {
     font-size: 15px;
     line-height: 1.85;
   }
 
-  .about-dots {
-    justify-content: center;
-    margin-bottom: 22px;
+  .about-facts li {
+    font-size: 14.5px;
   }
 }
 

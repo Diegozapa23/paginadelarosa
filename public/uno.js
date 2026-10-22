@@ -103,26 +103,20 @@
 })();
 
 // ============================================
-// ROTACION DE DATOS (seccion "Quien soy")
+// ROTACION DE FOTOS (seccion "Quien soy")
 // ============================================
 
 (function () {
-  const bloque = document.getElementById('aboutRotate');
-  const puntos = document.getElementById('aboutDots');
-  if (!bloque) return;
+  const fotos = Array.from(document.querySelectorAll('.about-foto'));
+  if (fotos.length < 2) return;
 
-  const textos = Array.from(bloque.querySelectorAll('p'));
-  const marcas = puntos ? Array.from(puntos.querySelectorAll('span')) : [];
-  if (textos.length < 2) return;
-
-  const CADA_MS = 5000;
+  const CADA_MS = 4500;
   let actual = 0;
   let timer = null;
 
   function mostrar(indice) {
-    actual = indice % textos.length;
-    textos.forEach((p, i) => p.classList.toggle('is-active', i === actual));
-    marcas.forEach((m, i) => m.classList.toggle('is-active', i === actual));
+    actual = indice % fotos.length;
+    fotos.forEach((f, i) => f.classList.toggle('is-active', i === actual));
   }
 
   function arrancar() {
@@ -133,8 +127,7 @@
   mostrar(0);
   arrancar();
 
-  // se pausa al pasar el mouse (para poder leer) y se reanuda al salir
-  const zona = bloque.closest('.about') || bloque;
+  const zona = document.querySelector('.about') || fotos[0];
   zona.addEventListener('mouseenter', () => clearInterval(timer));
   zona.addEventListener('mouseleave', arrancar);
 })();

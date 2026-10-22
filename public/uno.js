@@ -9,12 +9,12 @@
   const video = document.getElementById('preloaderVideo');
   const inicio = Date.now();
 
-  const MIN_SIN_VIDEO = 1400;  // sin video (iPhone con autoplay bloqueado): fallback y fuera
+  const MIN_SIN_VIDEO = 3000;  // sin video (iPhone con autoplay bloqueado): fallback visible
   const MIN_SIN_ANIM = 500;    // prefers-reduced-motion: casi inmediato
   const ESPERA_VIDEO = 8.0;    // segundos de video: la mariposa posada, antes de que se borre
   const ESPERA_LENTA = 4.0;    // si el video va lento, se revela antes
   const MAX_MS = 9500;         // nunca mas de 9,5 s reteniendo al visitante
-  const ESPERA_FALLBACK = 2200; // si en 2,2 s el video no arranca, se muestra el fallback
+  const ESPERA_FALLBACK = 3000; // si en 3 s el video no arranca, se muestra el fallback
 
   const sinAnimacion = window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -33,6 +33,7 @@
     oculto = true;
     preloader.classList.add('hidden');
     document.body.classList.remove('preloader-active');
+    document.dispatchEvent(new Event('preloader:oculto'));
     setTimeout(() => preloader.remove(), 2400);
   }
 
@@ -42,34 +43,38 @@
     video.classList.add('visible');
   }
 
-  // el logo del fallback solo se descarga si el video no arranca
-  function cargarFallback() {
-    const img = preloader.querySelector('.preloader-logo');
-    if (img && img.dataset.src && !img.src) img.src = img.dataset.src;
-  }
-
   // iOS puede bloquear el autoplay (Low Power Mode, politicas de datos):
   // en vez de dejar un fotograma congelado, se muestra el preloader en CSS
   function mostrarFallback() {
     if (fallbackVisible || reproduciendo) return;
     fallbackVisible = true;
-    cargarFallback();
     preloader.classList.remove('preloader-video-ready');
     if (video) video.classList.remove('visible');
     setTimeout(ocultar, MIN_SIN_VIDEO);
   }
 
+  function iniciarVideo() {
+    if (reproduciendo) return;
+    let p;
+    try {
+      p = video.play();
+    } catch (error) {
+      mostrarFallback();
+      return;
+    }
+    if (p && typeof p.then === 'function') {
+      p.then(() => { mostrarVideo(); reproduciendo = true; })
+       .catch(() => { mostrarFallback(); });
+    } else {
+      mostrarVideo();
+      reproduciendo = true;
+    }
+  }
+
   if (video && !sinAnimacion) {
-    video.addEventListener('canplay', () => {
-      // solo se oculta el fallback si el video arranca de verdad
-      const p = video.play();
-      if (p && typeof p.then === 'function') {
-        p.then(() => { mostrarVideo(); reproduciendo = true; })
-         .catch(() => { mostrarFallback(); });
-      } else {
-        mostrarVideo();
-      }
-    });
+    // si el video ya arranco antes de este script, canplay/playing no se repiten
+    if (video.readyState >= 3 || !video.paused) iniciarVideo();
+    video.addEventListener('canplay', iniciarVideo);
     video.addEventListener('playing', () => { mostrarVideo(); reproduciendo = true; });
     video.addEventListener('error', () => { videoListo = false; reproduciendo = false; mostrarFallback(); });
   }
@@ -131,9 +136,22 @@
     const fotos = Array.from(document.querySelectorAll('.about-media-izq .about-foto'));
     if (fotos.length > 1) {
       fotos.forEach((f, i) => f.classList.toggle('is-active', i === 0));
-      setTimeout(() => {
-        fotos.forEach((f, i) => f.classList.toggle('is-active', i === fotos.length - 1));
-      }, 3000);
+
+      let programado = false;
+      function programarCambio() {
+        if (programado) return;
+        programado = true;
+        setTimeout(() => {
+          fotos.forEach((f, i) => f.classList.toggle('is-active', i === fotos.length - 1));
+        }, 8000);
+      }
+
+      if (document.getElementById('preloader')) {
+        document.addEventListener('preloader:oculto', programarCambio, { once: true });
+        setTimeout(programarCambio, 15000);
+      } else {
+        programarCambio();
+      }
     }
     return;
   }

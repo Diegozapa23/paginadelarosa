@@ -9,11 +9,12 @@
   const video = document.getElementById('preloaderVideo');
   const inicio = Date.now();
 
-  const MIN_SIN_VIDEO = 3000;  // fallback CSS: 3 s y fuera
+  const MIN_SIN_VIDEO = 1400;  // sin video (iPhone con autoplay bloqueado): fallback y fuera
   const MIN_SIN_ANIM = 500;    // prefers-reduced-motion: casi inmediato
   const ESPERA_VIDEO = 8.0;    // segundos de video: la mariposa posada, antes de que se borre
   const ESPERA_LENTA = 4.0;    // si el video va lento, se revela antes
   const MAX_MS = 9500;         // nunca mas de 9,5 s reteniendo al visitante
+  const ESPERA_FALLBACK = 2200; // si en 2,2 s el video no arranca, se muestra el fallback
 
   const sinAnimacion = window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -23,6 +24,7 @@
   let videoListo = false;
   let reproduciendo = false;
   let lento = false;
+  let fallbackVisible = false;
 
   document.body.classList.add('preloader-active');
 
@@ -32,12 +34,6 @@
     preloader.classList.add('hidden');
     document.body.classList.remove('preloader-active');
     setTimeout(() => preloader.remove(), 2400);
-  }
-
-  function reproducir() {
-    if (!video) return;
-    const p = video.play();
-    if (p && typeof p.catch === 'function') p.catch(() => {});
   }
 
   function mostrarVideo() {
@@ -52,32 +48,42 @@
     if (img && img.dataset.src && !img.src) img.src = img.dataset.src;
   }
 
+  // iOS puede bloquear el autoplay (Low Power Mode, politicas de datos):
+  // en vez de dejar un fotograma congelado, se muestra el preloader en CSS
+  function mostrarFallback() {
+    if (fallbackVisible || reproduciendo) return;
+    fallbackVisible = true;
+    cargarFallback();
+    preloader.classList.remove('preloader-video-ready');
+    if (video) video.classList.remove('visible');
+    setTimeout(ocultar, MIN_SIN_VIDEO);
+  }
+
   if (video && !sinAnimacion) {
     video.addEventListener('canplay', () => {
       // solo se oculta el fallback si el video arranca de verdad
       const p = video.play();
       if (p && typeof p.then === 'function') {
         p.then(() => { mostrarVideo(); reproduciendo = true; })
-         .catch(() => { cargarFallback(); });
+         .catch(() => { mostrarFallback(); });
       } else {
         mostrarVideo();
       }
     });
     video.addEventListener('playing', () => { mostrarVideo(); reproduciendo = true; });
-    // si el video falla, se queda el fallback en CSS
-    video.addEventListener('error', () => {
-      videoListo = false;
-      reproduciendo = false;
-      cargarFallback();
-    });
+    video.addEventListener('error', () => { videoListo = false; reproduciendo = false; mostrarFallback(); });
   }
 
+  // watchdog: si el video no está corriendo, se cambia al fallback en CSS
+  setTimeout(() => {
+    if (!reproduciendo) mostrarFallback();
+  }, ESPERA_FALLBACK);
 
   function listoParaRevelar() {
     if (sinAnimacion) return paginaLista && (Date.now() - inicio) >= MIN_SIN_ANIM;
     if (videoListo && reproduciendo) {
       // si el video no avanza a buen ritmo, se revela antes de esperar 8 s
-      if (!lento && (Date.now() - inicio) > 6000 && video.currentTime < 4.5) lento = true;
+      if (!lento && (Date.now() - inicio) > 6000 && video.currentTime < 3.5) lento = true;
       return paginaLista && video.currentTime >= (lento ? ESPERA_LENTA : ESPERA_VIDEO);
     }
     return paginaLista && (Date.now() - inicio) >= MIN_SIN_VIDEO;
@@ -90,7 +96,7 @@
   }
 
   window.addEventListener('load', () => { paginaLista = true; });
-  setTimeout(chequear, 120);
+  setTimeout(chequear, 100);
 
   // clic para saltar
   preloader.addEventListener('click', ocultar);

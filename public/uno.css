@@ -2899,3 +2899,21 @@ transition:.4s ease;
   }
 }
 
+@media (min-width: 1024px) {
+  .about-content-wrapper {
+    align-items: start;
+  }
+
+  .about-media-izq {
+    margin-top: 0;
+  }
+
+  .about-text {
+    margin-top: 80px;
+  }
+
+  .about-media-der {
+    margin-top: 160px;
+  }
+}
+

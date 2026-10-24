@@ -819,7 +819,7 @@
     const caja = document.getElementById('day-horas');
     const pasado = fechaStr < hoyISO();
     const habilitadas = disponibilidad[fechaStr] || [];
-    const reservadas = new Set(todasLasReservas.filter(r => r.fecha === fechaStr).map(r => r.hora));
+    const reservadas = new Set(todasLasReservas.filter(r => r.fecha === fechaStr && !r.pagoVencido).map(r => r.hora));
     const libres = habilitadas.filter(h => !reservadas.has(h)).length;
 
     const estado = pasado ? 'Día pasado'
@@ -932,6 +932,14 @@
     }
   }
 
+  function textoEstadoPago(r) {
+    if (r.pagado && r.conflicto) return '⚠ Pagó tarde: hora repetida';
+    if (r.pagado) return '✓ Pagado';
+    if (r.pagoVencido) return '✗ Pago no completado (hora liberada)';
+    if (r.estado === 'pendiente_pago') return '◷ Pago pendiente';
+    return '✗ No pagado';
+  }
+
   function seleccionarDia(fechaStr) {
     diaSeleccionado = fechaStr;
     renderCalendario();
@@ -964,7 +972,7 @@
           ${r.payment_url ? `<div class="reserva-tel">→ <a href="${r.payment_url}" target="_blank" style="color:#c9b5ab;">Link de pago</a></div>` : ''}
         </div>
         <div class="reserva-actions">
-          <span class="badge-pagado ${r.pagado ? 'badge-si' : 'badge-no'}">${r.pagado ? '✓ Pagado' : (r.estado === 'pendiente_pago' ? '◷ Pago pendiente' : '✗ No pagado')}</span>
+          <span class="badge-pagado ${r.pagado ? 'badge-si' : 'badge-no'}">${textoEstadoPago(r)}</span>
           <button class="btn-toggle-pago" onclick="togglePago('${r.id}', ${r.pagado}, '${fechaStr}')">
             ${r.pagado ? 'Marcar no pagado' : 'Marcar pagado'}
           </button>

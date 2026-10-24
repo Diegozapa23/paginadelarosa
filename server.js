@@ -233,8 +233,21 @@ async function borrarDisponibilidadPasada(hoy) {
 }
 
 // horas que puede elegir una clienta = habilitadas menos las ya reservadas
+// Una reserva web sin pagar retiene la hora solo un rato: si la clienta
+// abandona el pago, la hora vuelve a quedar libre. El cobro de Khipu vence
+// antes (MINUTOS_PARA_PAGAR) para que nadie pague una hora ya liberada.
+const MINUTOS_PARA_PAGAR = 30;
+const MINUTOS_RETENCION = 45;
+
+function ocupaHora(r) {
+  if (r.pagado || r.estado !== "pendiente_pago") return true;
+  const creada = Date.parse(r.fechaReserva || "");
+  if (!creada) return true;
+  return Date.now() - creada < MINUTOS_RETENCION * 60000;
+}
+
 function quitarOcupadas(fecha, habilitadas, reservas) {
-  const ocupadas = new Set(reservas.filter(r => r.fecha === fecha).map(r => r.hora));
+  const ocupadas = new Set(reservas.filter(r => r.fecha === fecha && ocupaHora(r)).map(r => r.hora));
   return (habilitadas || []).filter(h => !ocupadas.has(h)).sort();
 }
 
@@ -326,7 +339,9 @@ async function crearCobroKhipu(reserva) {
     return_url: `${urlBase}/confirmacion.html?reserva=${reserva.id}`,
     cancel_url: `${urlBase}/agenda.html`,
     notify_url: `${urlBase}/webhook/khipu`,
-    notify_api_version: "3.0"
+    notify_api_version: "3.0",
+    // el cobro vence antes de que la hora se libere
+    expires_date: new Date(Date.now() + MINUTOS_PARA_PAGAR * 60000).toISOString()
   };
 
   // cuenta receptora explicita (si esta configurada)
@@ -334,16 +349,26 @@ async function crearCobroKhipu(reserva) {
     body.receiver_id = process.env.KHIPU_RECEIVER_ID;
   }
 
-  const respuesta = await fetch(`${KHIPU_API}/payments`, {
+  const enviar = (b) => fetch(`${KHIPU_API}/payments`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "x-api-key": KHIPU_API_KEY
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify(b)
   });
 
-  const data = await respuesta.json();
+  let respuesta = await enviar(body);
+  let data = await respuesta.json();
+
+  // red de seguridad: si Khipu rechazara el vencimiento, se cobra sin el
+  // (la hora igual se libera a los MINUTOS_RETENCION)
+  if (!respuesta.ok && respuesta.status === 400 && JSON.stringify(data).includes("expires_date")) {
+    console.log("AVISO Khipu rechazo expires_date, reintentando sin vencimiento:", JSON.stringify(data));
+    delete body.expires_date;
+    respuesta = await enviar(body);
+    data = await respuesta.json();
+  }
   if (!respuesta.ok) {
     const detalle = (data && data.errors && data.errors.length)
       ? data.errors.map(e => `${e.field}: ${e.message}`).join(" | ")
@@ -425,7 +450,8 @@ app.post("/crear-pago", limitarCrearPago, async (req, res) => {
 
     const existe = reservas.find(r =>
       r.fecha === reserva.fecha &&
-      r.hora === reserva.hora
+      r.hora === reserva.hora &&
+      ocupaHora(r)
     );
 
     if (existe) {
@@ -550,7 +576,7 @@ app.put("/disponibilidad", authAdmin, async (req, res) => {
 app.get("/horas-ocupadas", async (req, res) => {
   const fecha = req.query.fecha;
   const reservas = await leerReservas();
-  const horasOcupadas = reservas.filter(r => r.fecha === fecha).map(r => r.hora);
+  const horasOcupadas = reservas.filter(r => r.fecha === fecha && ocupaHora(r)).map(r => r.hora);
   res.json(horasOcupadas);
 });
 
@@ -575,6 +601,14 @@ app.post("/webhook/khipu", async (req, res) => {
       reservas[idx].payment_id = evento.payment_id || reservas[idx].payment_id;
       reservas[idx].conciliation_date = evento.conciliation_date || null;
       reservas[idx].fechaPago = new Date().toISOString();
+      // caso raro: pago llego tarde y la hora ya la tomo otra clienta
+      const r = reservas[idx];
+      const otra = reservas.find(x => String(x.id) !== String(r.id) &&
+        x.fecha === r.fecha && x.hora === r.hora && ocupaHora(x));
+      if (otra) {
+        r.conflicto = true;
+        console.log(`AVISO: pago tardio de ${r.id}, la hora ${r.fecha} ${r.hora} ya estaba tomada`);
+      }
       await guardarReservas(reservas);
       console.log(`✅ Pago confirmado para reserva ${evento.transaction_id}`);
     }
@@ -800,7 +834,8 @@ app.get("/reservas", authAdmin, async (req, res) => {
   });
 
   if (cambio) await guardarReservas(reservas);
-  res.json(reservas);
+  // pagoVencido: reserva web abandonada que ya no retiene la hora
+  res.json(reservas.map(r => ocupaHora(r) ? r : { ...r, pagoVencido: true }));
 });
 
 app.delete("/eliminar-reserva/:id", authAdmin, async (req, res) => {

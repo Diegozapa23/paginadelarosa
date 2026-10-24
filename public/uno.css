@@ -104,13 +104,23 @@ body {
 /* fallback en CSS para navegadores sin video (o si el archivo no carga) */
 
 .preloader-fallback {
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
 .preloader.preloader-video-ready .preloader-fallback {
+  display: none;
+}
+
+/* el respaldo solo aparece si el video no arranco: antes de eso
+   se ve solo el fondo crema, sin otra imagen que despues cambie */
+.preloader.preloader-fallback-on .preloader-fallback {
+  display: flex;
+}
+
+.preloader.preloader-fallback-on .preloader-video {
   display: none;
 }
 

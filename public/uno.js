@@ -40,6 +40,7 @@
   function mostrarVideo() {
     videoListo = true;
     preloader.classList.add('preloader-video-ready');
+    preloader.classList.remove('preloader-fallback-on');
     video.classList.add('visible');
   }
 
@@ -49,6 +50,7 @@
     if (fallbackVisible || reproduciendo) return;
     fallbackVisible = true;
     preloader.classList.remove('preloader-video-ready');
+    preloader.classList.add('preloader-fallback-on');
     if (video) video.classList.remove('visible');
     setTimeout(ocultar, MIN_SIN_VIDEO);
   }

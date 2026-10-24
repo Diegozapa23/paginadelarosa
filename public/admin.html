@@ -138,7 +138,7 @@
     .cal-day:hover { border-color: #d8c9c0; background: white; }
     .cal-day.empty { background: transparent; cursor: default; border: none; }
     .cal-day.today { border-color: #d8c9c0; background: white; }
-    .cal-day.selected { background: linear-gradient(135deg, #d8c9c0, #c9b5ab); border-color: transparent; }
+    .cal-grid .cal-day.selected { background: linear-gradient(135deg, #d8c9c0, #c9b5ab); border-color: transparent; }
     .cal-day.selected .cal-day-num { color: white; }
     .cal-day.selected .cal-dot { background: white; }
     .cal-day.selected .cal-count { color: rgba(255,255,255,0.85); }
@@ -189,6 +189,35 @@
       transition: 0.2s; white-space: nowrap;
     }
     .btn-link-pago:hover { background: #c9b5ab; color: white; border-color: #c9b5ab; }
+    /* HORAS HABILITADAS DEL DÍA */
+    .cal-day.has-horas:not(.selected) { background: white; border-color: rgba(201,181,171,0.55); }
+    .cal-horas { font-size: 9px; color: #b5a39a; font-weight: 600; letter-spacing: 0.3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cal-day.selected .cal-horas { color: rgba(255,255,255,0.9); }
+    .horas-dia {
+      background: #fffaf8; border: 1px solid rgba(216,201,192,0.5); border-radius: 16px;
+      padding: 16px 18px; margin-bottom: 16px;
+    }
+    .horas-dia-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+    .horas-dia h4 { font-size: 11px; letter-spacing: 2px; font-weight: 600; color: #7a716d; }
+    .horas-estado { font-size: 11px; color: #b5a39a; }
+    .horas-ayuda { font-size: 12px; color: #999; margin-bottom: 12px; line-height: 1.5; }
+    .horas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; }
+    .hora-chip {
+      padding: 10px 0; border-radius: 10px; border: 1px solid rgba(216,201,192,0.9);
+      background: white; color: #b0a49e; font-family: 'Montserrat', sans-serif;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.15s;
+    }
+    .hora-chip.on { background: #c9b5ab; border-color: #c9b5ab; color: white; }
+    .hora-chip.reservada { background: #f3ebe7; border-color: #e6d9d2; color: #9b8c85; cursor: not-allowed; font-size: 11px; line-height: 1.3; }
+    .hora-chip:disabled:not(.reservada) { opacity: 0.5; cursor: default; }
+    .horas-acciones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .horas-acciones button {
+      background: none; border: 1px solid rgba(216,201,192,0.8); color: #7a716d;
+      padding: 7px 12px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: 600;
+      font-family: 'Montserrat', sans-serif; transition: 0.2s;
+    }
+    .horas-acciones button:hover { background: #d8c9c0; color: white; border-color: #d8c9c0; }
+
     .empty-day { text-align: center; padding: 36px 20px; color: #ccc; font-size: 14px; overflow: hidden; }
     .empty-day .icon { font-size: 30px; margin-bottom: 8px; display: block; }
 
@@ -434,6 +463,7 @@
       <div class="cal-grid" id="cal-grid"></div>
       <div class="day-panel" id="day-panel">
         <div class="day-panel-title" id="day-panel-title"></div>
+        <div id="day-horas"></div>
         <div id="day-reservas"></div>
       </div>
     </div>
@@ -512,8 +542,9 @@
         <input type="date" id="adminFecha" required>
         <select id="adminHora" required>
           <option value="">Hora</option>
-          <option>10:00</option><option>11:00</option><option>12:00</option>
-          <option>15:00</option><option>16:00</option><option>17:00</option>
+          <option>09:00</option><option>10:00</option><option>11:00</option><option>12:00</option>
+          <option>13:00</option><option>14:00</option><option>15:00</option><option>16:00</option>
+          <option>17:00</option><option>18:00</option><option>19:00</option><option>20:00</option>
         </select>
         <select id="adminPagado">
           <option value="true">Pagado</option>
@@ -709,6 +740,116 @@
     diaSeleccionado = null;
     document.getElementById('day-panel').classList.remove('visible');
     renderCalendario();
+    cargarDisponibilidadMes();
+  }
+
+  // ============================================
+  // HORAS HABILITADAS (las clientas solo ven estas)
+  // ============================================
+  let horasPosibles = ["09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00"];
+  let disponibilidad = {}; // { "2026-10-28": ["10:00", ...] }
+
+  function fechaISO(d) {
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  function hoyISO() { return fechaISO(new Date()); }
+
+  async function cargarDisponibilidadMes() {
+    const desde = fechaISO(new Date(anioActual, mesActual, 1));
+    const hasta = fechaISO(new Date(anioActual, mesActual + 1, 0));
+    try {
+      const res = await fetch(`/disponibilidad?desde=${desde}&hasta=${hasta}`, { headers: headers() });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (Array.isArray(data.horasPosibles)) horasPosibles = data.horasPosibles;
+      Object.assign(disponibilidad, data.dias || {});
+      // dias del mes sin horas: quitarlos del mapa local
+      Object.keys(disponibilidad).forEach(f => {
+        if (f >= desde && f <= hasta && !(data.dias || {})[f]) delete disponibilidad[f];
+      });
+      renderCalendario();
+      if (diaSeleccionado) renderHorasDia(diaSeleccionado);
+    } catch (e) { console.error(e); }
+  }
+
+  async function guardarHoras(fechas, horas) {
+    const res = await fetch('/disponibilidad', {
+      method: 'PUT', headers: headers(), body: JSON.stringify({ fechas, horas })
+    });
+    if (!res.ok) throw new Error('No se pudo guardar');
+    fechas.forEach(f => {
+      if (horas.length) disponibilidad[f] = [...horas].sort(); else delete disponibilidad[f];
+    });
+  }
+
+  function renderHorasDia(fechaStr) {
+    const caja = document.getElementById('day-horas');
+    const pasado = fechaStr < hoyISO();
+    const habilitadas = disponibilidad[fechaStr] || [];
+    const reservadas = new Set(todasLasReservas.filter(r => r.fecha === fechaStr).map(r => r.hora));
+    const libres = habilitadas.filter(h => !reservadas.has(h)).length;
+
+    const estado = pasado ? 'Día pasado'
+      : habilitadas.length === 0 ? 'Cerrado: las clientas no ven horas'
+      : `${libres} libre${libres === 1 ? '' : 's'} para reservar`;
+
+    caja.innerHTML = `
+      <div class="horas-dia">
+        <div class="horas-dia-top">
+          <h4>HORAS PARA LA WEB</h4>
+          <span class="horas-estado">${estado}</span>
+        </div>
+        ${pasado ? '' : '<p class="horas-ayuda">Toca una hora para abrirla o cerrarla. Solo las horas abiertas aparecen en la página de reservas.</p>'}
+        <div class="horas-grid">
+          ${horasPosibles.map(h => {
+            if (reservadas.has(h)) return `<button class="hora-chip reservada" disabled title="Ya tiene una reserva">${h}<br>reservada</button>`;
+            const on = habilitadas.includes(h);
+            return `<button class="hora-chip ${on ? 'on' : ''}" ${pasado ? 'disabled' : ''} onclick="alternarHora('${fechaStr}','${h}')">${h}</button>`;
+          }).join('')}
+        </div>
+        ${pasado ? '' : `
+        <div class="horas-acciones">
+          <button onclick="fijarHorasDia('${fechaStr}', 'todas')">Abrir todas</button>
+          <button onclick="fijarHorasDia('${fechaStr}', 'ninguna')">Cerrar todas</button>
+          <button onclick="repetirSemanas('${fechaStr}')">Repetir 4 semanas</button>
+        </div>`}
+      </div>`;
+  }
+
+  async function alternarHora(fechaStr, hora) {
+    const actuales = disponibilidad[fechaStr] || [];
+    const nuevas = actuales.includes(hora) ? actuales.filter(h => h !== hora) : [...actuales, hora];
+    try {
+      await guardarHoras([fechaStr], nuevas);
+    } catch (e) { alert('No se pudo guardar. Revisa tu conexión.'); }
+    renderCalendario();
+    renderHorasDia(fechaStr);
+  }
+
+  async function fijarHorasDia(fechaStr, modo) {
+    const nuevas = modo === 'todas' ? [...horasPosibles] : [];
+    try {
+      await guardarHoras([fechaStr], nuevas);
+    } catch (e) { alert('No se pudo guardar. Revisa tu conexión.'); }
+    renderCalendario();
+    renderHorasDia(fechaStr);
+  }
+
+  async function repetirSemanas(fechaStr) {
+    const horas = disponibilidad[fechaStr] || [];
+    const fechas = [1, 2, 3, 4].map(n => {
+      const d = new Date(fechaStr + 'T12:00:00');
+      d.setDate(d.getDate() + 7 * n);
+      return fechaISO(d);
+    });
+    const dia = new Date(fechaStr + 'T12:00:00').toLocaleDateString('es-CL', { weekday: 'long' });
+    const texto = horas.length ? horas.join(', ') : 'ninguna hora (cerrado)';
+    if (!confirm(`¿Copiar ${texto} a los próximos 4 ${dia}?`)) return;
+    try {
+      await guardarHoras(fechas, horas);
+      renderCalendario();
+      alert('Listo, horas copiadas a las próximas 4 semanas.');
+    } catch (e) { alert('No se pudo guardar. Revisa tu conexión.'); }
   }
 
   function renderCalendario() {
@@ -741,6 +882,8 @@
       const el = document.createElement('div');
       el.className = 'cal-day';
       if (rdias.length > 0) el.classList.add('has-reservas');
+      const nHoras = (disponibilidad[fechaStr] || []).length;
+      if (nHoras > 0) el.classList.add('has-horas');
       if (d === hoy.getDate() && mesActual === hoy.getMonth() && anioActual === hoy.getFullYear()) el.classList.add('today');
       if (diaSeleccionado === fechaStr) el.classList.add('selected');
 
@@ -749,7 +892,8 @@
         ${rdias.length > 0 ? `
           <div class="cal-dots">${rdias.slice(0,3).map(() => '<div class="cal-dot"></div>').join('')}</div>
           <div class="cal-count">${rdias.length} reserva${rdias.length > 1 ? 's' : ''}</div>
-        ` : ''}`;
+        ` : ''}
+        ${nHoras > 0 ? `<div class="cal-horas">${nHoras} h</div>` : ''}`;
       el.onclick = () => seleccionarDia(fechaStr);
       grid.appendChild(el);
     }
@@ -768,6 +912,7 @@
     });
     titulo.textContent = nombreDia;
     panel.classList.add('visible');
+    renderHorasDia(fechaStr);
 
     const rdias = todasLasReservas.filter(r => r.fecha === fechaStr).sort((a,b) => (a.hora||'').localeCompare(b.hora||''));
 
@@ -1012,7 +1157,7 @@
   // INIT
   // ============================================
   requestNotificationPermission();
-  cargarReservas();
+  cargarReservas().then(cargarDisponibilidadMes);
 </script>
 
 </body>

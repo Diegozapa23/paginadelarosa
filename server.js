@@ -84,7 +84,25 @@ app.use(express.static(PUBLIC_DIR, {
 // HELPERS
 // ============================================
 
-const HORAS_DISPONIBLES = ["10:00", "11:00", "12:00", "15:00", "16:00", "17:00"];
+// Horas que la administradora puede habilitar en el panel.
+// Ningun dia tiene horas abiertas hasta que ella las habilita.
+const HORAS_POSIBLES = [
+  "09:00", "10:00", "11:00", "12:00", "13:00", "14:00",
+  "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"
+];
+
+const FECHA_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+// fecha de hoy en Chile (el servidor de Render corre en UTC)
+function hoyChile() {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Santiago" }).format(new Date());
+}
+
+function sumarDias(fecha, dias) {
+  const d = new Date(fecha + "T12:00:00Z");
+  d.setUTCDate(d.getUTCDate() + dias);
+  return d.toISOString().slice(0, 10);
+}
 
 function validarReserva(reserva) {
   if (!reserva || typeof reserva !== "object") {
@@ -108,18 +126,11 @@ function validarReserva(reserva) {
     return "Por favor, selecciona una fecha válida";
   }
 
-  const hoyLocal = new Date();
-  const hoy = [
-    hoyLocal.getFullYear(),
-    String(hoyLocal.getMonth() + 1).padStart(2, "0"),
-    String(hoyLocal.getDate()).padStart(2, "0")
-  ].join("-");
-
-  if (reserva.fecha < hoy) {
+  if (reserva.fecha < hoyChile()) {
     return "No puedes reservar para una fecha pasada";
   }
 
-  if (!HORAS_DISPONIBLES.includes(reserva.hora)) {
+  if (!HORAS_POSIBLES.includes(reserva.hora)) {
     return "Por favor, selecciona una hora válida";
   }
 
@@ -130,6 +141,7 @@ const DATABASE_URL = process.env.DATABASE_URL;
 
 // ruta ABSOLUTA del archivo de reservas (en un hosting el cwd puede cambiar)
 const ARCHIVO_RESERVAS = path.join(__dirname, "reservas.json");
+const ARCHIVO_DISPONIBILIDAD = path.join(__dirname, "disponibilidad.json");
 
 let pool = null;
 if (DATABASE_URL) {
@@ -160,6 +172,75 @@ async function iniciarBaseDeDatos() {
       data JSONB NOT NULL
     )
   `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS disponibilidad (
+      fecha TEXT PRIMARY KEY,
+      horas JSONB NOT NULL
+    )
+  `);
+}
+
+// ============================================
+// DISPONIBILIDAD: horas que habilita la administradora, por fecha
+// ============================================
+
+function leerArchivoDisponibilidad() {
+  if (!fs.existsSync(ARCHIVO_DISPONIBILIDAD)) return {};
+  const texto = fs.readFileSync(ARCHIVO_DISPONIBILIDAD, "utf8").replace(/^﻿/, "");
+  return texto.trim() ? JSON.parse(texto) : {};
+}
+
+// devuelve { "2026-10-28": ["10:00", "11:00"], ... } entre dos fechas (incluidas)
+async function leerDisponibilidad(desde, hasta) {
+  if (usarBaseDeDatos()) {
+    const r = await pool.query(
+      "SELECT fecha, horas FROM disponibilidad WHERE fecha >= $1 AND fecha <= $2",
+      [desde, hasta]
+    );
+    return Object.fromEntries(r.rows.map(f => [f.fecha, f.horas]));
+  }
+  const todo = leerArchivoDisponibilidad();
+  return Object.fromEntries(Object.entries(todo).filter(([f]) => f >= desde && f <= hasta));
+}
+
+async function guardarDisponibilidad(fecha, horas) {
+  if (usarBaseDeDatos()) {
+    if (horas.length === 0) {
+      await pool.query("DELETE FROM disponibilidad WHERE fecha = $1", [fecha]);
+    } else {
+      await pool.query(
+        "INSERT INTO disponibilidad (fecha, horas) VALUES ($1, $2) ON CONFLICT (fecha) DO UPDATE SET horas = EXCLUDED.horas",
+        [fecha, JSON.stringify(horas)]
+      );
+    }
+    return;
+  }
+  const todo = leerArchivoDisponibilidad();
+  if (horas.length === 0) delete todo[fecha]; else todo[fecha] = horas;
+  fs.writeFileSync(ARCHIVO_DISPONIBILIDAD, JSON.stringify(todo, null, 2));
+}
+
+async function borrarDisponibilidadPasada(hoy) {
+  if (usarBaseDeDatos()) {
+    await pool.query("DELETE FROM disponibilidad WHERE fecha < $1", [hoy]);
+    return;
+  }
+  const todo = leerArchivoDisponibilidad();
+  const quedan = Object.fromEntries(Object.entries(todo).filter(([f]) => f >= hoy));
+  if (Object.keys(quedan).length !== Object.keys(todo).length) {
+    fs.writeFileSync(ARCHIVO_DISPONIBILIDAD, JSON.stringify(quedan, null, 2));
+  }
+}
+
+// horas que puede elegir una clienta = habilitadas menos las ya reservadas
+function quitarOcupadas(fecha, habilitadas, reservas) {
+  const ocupadas = new Set(reservas.filter(r => r.fecha === fecha).map(r => r.hora));
+  return (habilitadas || []).filter(h => !ocupadas.has(h)).sort();
+}
+
+async function horasLibres(fecha, reservas) {
+  const disp = await leerDisponibilidad(fecha, fecha);
+  return quitarOcupadas(fecha, disp[fecha], reservas);
 }
 
 async function leerReservas() {
@@ -351,6 +432,11 @@ app.post("/crear-pago", limitarCrearPago, async (req, res) => {
       return res.json({ error: true, mensaje: "Esa hora ya está ocupada." });
     }
 
+    const libres = await horasLibres(reserva.fecha, reservas);
+    if (!libres.includes(reserva.hora)) {
+      return res.json({ error: true, mensaje: "Esa hora no está disponible. Elige otra, por favor." });
+    }
+
     const id = Date.now().toString();
 
     const nuevaReserva = {
@@ -399,6 +485,65 @@ app.post("/crear-pago", limitarCrearPago, async (req, res) => {
   } catch (error) {
     console.log("ERROR /crear-pago:", error);
     res.status(500).json({ error: true, mensaje: "Error al crear la reserva" });
+  }
+});
+
+// horas que la clienta puede elegir para una fecha
+app.get("/horas-disponibles", async (req, res) => {
+  try {
+    const fecha = String(req.query.fecha || "");
+    if (!FECHA_RE.test(fecha) || fecha < hoyChile()) return res.json([]);
+    res.json(await horasLibres(fecha, await leerReservas()));
+  } catch (error) {
+    console.log("ERROR /horas-disponibles:", error.message);
+    res.status(500).json([]);
+  }
+});
+
+// proximos 60 dias que tienen al menos una hora libre
+app.get("/dias-disponibles", async (req, res) => {
+  try {
+    const hoy = hoyChile();
+    const disp = await leerDisponibilidad(hoy, sumarDias(hoy, 60));
+    const reservas = await leerReservas();
+    const dias = Object.keys(disp).sort()
+      .filter(fecha => quitarOcupadas(fecha, disp[fecha], reservas).length > 0);
+    res.json(dias);
+  } catch (error) {
+    console.log("ERROR /dias-disponibles:", error.message);
+    res.status(500).json([]);
+  }
+});
+
+// panel: horas habilitadas en un rango de fechas
+app.get("/disponibilidad", authAdmin, async (req, res) => {
+  try {
+    const desde = FECHA_RE.test(req.query.desde || "") ? req.query.desde : hoyChile();
+    const hasta = FECHA_RE.test(req.query.hasta || "") ? req.query.hasta : sumarDias(desde, 60);
+    res.json({ horasPosibles: HORAS_POSIBLES, dias: await leerDisponibilidad(desde, hasta) });
+  } catch (error) {
+    console.log("ERROR /disponibilidad:", error.message);
+    res.status(500).json({ error: true });
+  }
+});
+
+// panel: fija las horas habilitadas de una o varias fechas
+app.put("/disponibilidad", authAdmin, async (req, res) => {
+  try {
+    const fechas = Array.isArray(req.body.fechas) ? req.body.fechas : [];
+    const horas = Array.isArray(req.body.horas) ? req.body.horas : [];
+    if (!fechas.length || fechas.length > 60 || !fechas.every(f => FECHA_RE.test(f))) {
+      return res.status(400).json({ error: true, mensaje: "Fechas inválidas" });
+    }
+    if (!horas.every(h => HORAS_POSIBLES.includes(h))) {
+      return res.status(400).json({ error: true, mensaje: "Horas inválidas" });
+    }
+    const limpias = [...new Set(horas)].sort();
+    for (const f of fechas) await guardarDisponibilidad(f, limpias);
+    res.json({ ok: true });
+  } catch (error) {
+    console.log("ERROR guardando disponibilidad:", error.message);
+    res.status(500).json({ error: true, mensaje: "No se pudo guardar" });
   }
 });
 
@@ -526,7 +671,8 @@ app.post("/agregar-reserva", authAdmin, async (req, res) => {
 // ============================================
 
 async function limpiarReservasPasadas() {
-  const hoy = new Date().toISOString().split('T')[0];
+  const hoy = hoyChile();
+  await borrarDisponibilidadPasada(hoy);
   let reservas = await leerReservas();
   const antes = reservas.length;
   reservas = reservas.filter(r => r.fecha >= hoy);

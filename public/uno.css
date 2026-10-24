@@ -2939,3 +2939,55 @@ transition:.4s ease;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+/* ============================================
+   AGENDAR: atajos a los proximos dias con horas
+   ============================================ */
+
+.dias-disponibles {
+  margin: -4px 0 26px;
+  text-align: left;
+}
+
+.dias-titulo {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: 600;
+  color: #b5a39a;
+  text-transform: uppercase;
+}
+
+.dias-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dias-lista button {
+  padding: 8px 14px;
+  border: 1px solid rgba(216, 201, 192, 0.9);
+  border-radius: 999px;
+  background: #fffaf8;
+  color: #7a716d;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.dias-lista button:hover,
+.dias-lista button.activo {
+  background: #c9b5ab;
+  border-color: #c9b5ab;
+  color: #fff;
+}
+
+.dias-vacio {
+  font-size: 13px;
+  color: #8a807b;
+  line-height: 1.6;
+}

@@ -113,16 +113,15 @@
 
         <div class="form-group">
           <label for="hora"><svg class="label-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg> Hora disponible</label>
-          <select id="hora" required>
-            <option value="">Selecciona una hora</option>
-            <option>10:00</option>
-            <option>11:00</option>
-            <option>12:00</option>
-            <option>15:00</option>
-            <option>16:00</option>
-            <option>17:00</option>
+          <select id="hora" required disabled>
+            <option value="">Elige una fecha primero</option>
           </select>
         </div>
+      </div>
+
+      <div class="dias-disponibles" id="diasDisponibles" hidden>
+        <span class="dias-titulo">Próximos días con horas</span>
+        <div class="dias-lista" id="diasLista"></div>
       </div>
 
       <div class="form-group">

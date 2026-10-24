@@ -587,6 +587,174 @@ app.post("/webhook/khipu", async (req, res) => {
   }
 });
 
+// ============================================
+// CALENDARIO DEL CELULAR (.ics)
+// - clienta: descarga su cita pagada y la agrega a su calendario
+// - administradora: enlace privado que su celular revisa solo
+// ============================================
+
+const DIRECCION_LOCAL = "Pedro Riveros 1521, Los Jardines 2, Valle Lo Campino, Quilicura";
+const DURACION_CITA_MIN = 60;
+
+// diferencia entre la hora de Chile y UTC en un instante dado (en ms)
+function desfaseChile(fechaUtc) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Santiago", hourCycle: "h23",
+    year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", second: "2-digit"
+  }).formatToParts(fechaUtc).map(x => [x.type, x.value]));
+  const comoUtc = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second);
+  return comoUtc - fechaUtc.getTime();
+}
+
+// "2026-10-27" + "15:00" (hora de Chile) -> Date en UTC (respeta horario de verano)
+function horaChileAUtc(fecha, hora) {
+  const [y, m, d] = fecha.split("-").map(Number);
+  const [H, M] = hora.split(":").map(Number);
+  const base = Date.UTC(y, m - 1, d, H, M);
+  let t = base;
+  for (let i = 0; i < 2; i++) t = base - desfaseChile(new Date(t));
+  return new Date(t);
+}
+
+function fechaIcs(date) {
+  return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+}
+
+function textoIcs(s) {
+  return String(s || "").replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+}
+
+// las lineas de un .ics no deben pasar de 75 bytes
+function plegarLinea(linea) {
+  const partes = [];
+  let actual = "";
+  for (const ch of linea) {
+    if (Buffer.byteLength(actual + ch) > 74) { partes.push(actual); actual = " "; }
+    actual += ch;
+  }
+  partes.push(actual);
+  return partes.join("\r\n");
+}
+
+function armarIcs(lineas) {
+  return lineas.map(plegarLinea).join("\r\n") + "\r\n";
+}
+
+function horarioCita(r) {
+  const inicio = horaChileAUtc(r.fecha, r.hora);
+  const fin = new Date(inicio.getTime() + DURACION_CITA_MIN * 60000);
+  return { inicio, fin };
+}
+
+function eventoIcs(r, { paraAdmin }) {
+  const { inicio, fin } = horarioCita(r);
+  const titulo = paraAdmin
+    ? `${r.hora} ${r.nombre || "Cliente"} · ${r.servicio || ""}`
+    : `${r.servicio} · Beauty Studio De La Rosa`;
+  const detalle = paraAdmin
+    ? [
+        `Cliente: ${r.nombre || ""}`,
+        `Teléfono: ${r.telefono || ""}`,
+        `Servicio: ${r.servicio || ""}`,
+        `Anticipo: ${r.pagado ? "pagado" : "no pagado"}`,
+        r.comentario ? `Comentario: ${r.comentario}` : ""
+      ].filter(Boolean).join("\n")
+    : "Tu hora en Beauty Studio De La Rosa. Si necesitas cambiarla escríbenos por WhatsApp: +56 9 6467 0007";
+
+  const lineas = [
+    "BEGIN:VEVENT",
+    `UID:reserva-${r.id}@paginadelarosa`,
+    `DTSTAMP:${fechaIcs(new Date())}`,
+    `DTSTART:${fechaIcs(inicio)}`,
+    `DTEND:${fechaIcs(fin)}`,
+    `SUMMARY:${textoIcs(titulo)}`,
+    `DESCRIPTION:${textoIcs(detalle)}`,
+    `LOCATION:${textoIcs(DIRECCION_LOCAL)}`
+  ];
+  if (!paraAdmin) {
+    // recordatorio a la clienta un dia antes
+    lineas.push("BEGIN:VALARM", "ACTION:DISPLAY", "TRIGGER:-P1D", `DESCRIPTION:${textoIcs("Mañana tienes hora en Beauty Studio De La Rosa")}`, "END:VALARM");
+  }
+  lineas.push("END:VEVENT");
+  return lineas;
+}
+
+function enlaceGoogleCalendar(r) {
+  const { inicio, fin } = horarioCita(r);
+  const q = new URLSearchParams({
+    action: "TEMPLATE",
+    text: `${r.servicio} · Beauty Studio De La Rosa`,
+    dates: `${fechaIcs(inicio)}/${fechaIcs(fin)}`,
+    details: "Tu hora en Beauty Studio De La Rosa. Si necesitas cambiarla escríbenos por WhatsApp: +56 9 6467 0007",
+    location: DIRECCION_LOCAL
+  });
+  return `https://calendar.google.com/calendar/render?${q}`;
+}
+
+// clave del enlace privado: se deriva de la contraseña del panel,
+// asi que si se cambia la contraseña el enlace viejo deja de funcionar
+function tokenCalendario() {
+  const secreto = process.env.CALENDARIO_SECRETO || process.env.ADMIN_PASS;
+  if (!secreto) return null;
+  return crypto.createHmac("sha256", secreto).update("agenda-ics").digest("hex").slice(0, 32);
+}
+
+// reservas que van al calendario de la administradora:
+// todas menos las de la web que nunca se pagaron
+function reservaParaAgenda(r) {
+  return r.fecha && r.hora && (r.pagado || r.estado !== "pendiente_pago");
+}
+
+app.get("/reserva/:id/cita.ics", async (req, res) => {
+  const reservas = await leerReservas();
+  const r = reservas.find(x => String(x.id) === String(req.params.id));
+  if (!r || !r.pagado || !r.fecha || !r.hora) {
+    return res.status(404).send("Cita no encontrada");
+  }
+  const ics = armarIcs([
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Beauty Studio De La Rosa//Reservas//ES",
+    "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+    ...eventoIcs(r, { paraAdmin: false }),
+    "END:VCALENDAR"
+  ]);
+  res.setHeader("Content-Type", "text/calendar; charset=utf-8");
+  res.setHeader("Content-Disposition", 'inline; filename="cita-de-la-rosa.ics"');
+  res.setHeader("Cache-Control", "no-store");
+  res.send(ics);
+});
+
+app.get("/agenda.ics", async (req, res) => {
+  const esperado = tokenCalendario();
+  const recibido = String(req.query.token || "");
+  if (!esperado || recibido.length !== esperado.length ||
+      !crypto.timingSafeEqual(Buffer.from(recibido), Buffer.from(esperado))) {
+    return res.status(404).send("No encontrado");
+  }
+  const reservas = (await leerReservas()).filter(reservaParaAgenda);
+  const ics = armarIcs([
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Beauty Studio De La Rosa//Agenda//ES",
+    "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+    "X-WR-CALNAME:Reservas De La Rosa",
+    "X-WR-TIMEZONE:America/Santiago",
+    "REFRESH-INTERVAL;VALUE=DURATION:PT15M",
+    "X-PUBLISHED-TTL:PT15M",
+    ...reservas.flatMap(r => eventoIcs(r, { paraAdmin: true })),
+    "END:VCALENDAR"
+  ]);
+  res.setHeader("Content-Type", "text/calendar; charset=utf-8");
+  res.setHeader("Cache-Control", "no-store");
+  res.send(ics);
+});
+
+// panel: devuelve el enlace privado para suscribirse desde el celular
+app.get("/calendario-admin", authAdmin, (req, res) => {
+  const token = tokenCalendario();
+  if (!token) return res.status(500).json({ error: true });
+  const url = `${urlBase}/agenda.ics?token=${token}`;
+  res.json({ url, webcal: url.replace(/^https?:\/\//, "webcal://") });
+});
+
 app.get("/estado-reserva/:id", async (req, res) => {
   const id = String(req.params.id);
   const reservas = await leerReservas();
@@ -603,7 +771,11 @@ app.get("/estado-reserva/:id", async (req, res) => {
     servicio: reserva.servicio,
     fecha: reserva.fecha,
     hora: reserva.hora,
-    nombre: reserva.nombre
+    nombre: reserva.nombre,
+    calendario: reserva.pagado && reserva.fecha && reserva.hora ? {
+      ics: `/reserva/${encodeURIComponent(reserva.id)}/cita.ics`,
+      google: enlaceGoogleCalendar(reserva)
+    } : null
   });
 });
 

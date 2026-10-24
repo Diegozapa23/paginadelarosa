@@ -197,3 +197,34 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
+// ============================================
+// MAPA DE GOOGLE: se carga solo cuando la persona se acerca
+// (si se carga al inicio descarga ~500 KB de Google y hace mas lenta la pagina)
+// ============================================
+
+(function () {
+  const mapas = Array.from(document.querySelectorAll('iframe[data-src]'));
+  if (!mapas.length) return;
+
+  function cargar(iframe) {
+    if (iframe.src) return;
+    iframe.src = iframe.dataset.src;
+  }
+
+  if (!('IntersectionObserver' in window)) {
+    mapas.forEach(cargar);
+    return;
+  }
+
+  const observador = new IntersectionObserver((entradas) => {
+    entradas.forEach((e) => {
+      if (e.isIntersecting) {
+        cargar(e.target);
+        observador.unobserve(e.target);
+      }
+    });
+  }, { rootMargin: '400px 0px' });
+
+  mapas.forEach((m) => observador.observe(m));
+})();

@@ -417,9 +417,9 @@
 <div class="admin-body">
 
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('calendario', this)">📅 CALENDARIO</button>
-    <button class="tab-btn" onclick="switchTab('estadisticas', this)">📊 ESTADÍSTICAS</button>
-    <button class="tab-btn" onclick="switchTab('lista', this)">📋 LISTA</button>
+    <button class="tab-btn active" onclick="switchTab('calendario', this)">♢ CALENDARIO</button>
+    <button class="tab-btn" onclick="switchTab('estadisticas', this)">✧ ESTADÍSTICAS</button>
+    <button class="tab-btn" onclick="switchTab('lista', this)">❀ LISTA</button>
     <button class="tab-btn" onclick="switchTab('agregar', this)">+ AGREGAR</button>
   </div>
 
@@ -444,17 +444,17 @@
 
     <div class="stats-grid">
       <div class="stat-card">
-        <span class="stat-icon">📅</span>
+        <span class="stat-icon">◷</span>
         <div class="stat-num" id="stat-reservas">0</div>
         <div class="stat-label">RESERVAS ESTE MES</div>
       </div>
       <div class="stat-card">
-        <span class="stat-icon">💰</span>
+        <span class="stat-icon">$</span>
         <div class="stat-num" id="stat-ventas">$0</div>
         <div class="stat-label">INGRESOS ANTICIPOS</div>
       </div>
       <div class="stat-card">
-        <span class="stat-icon">✨</span>
+        <span class="stat-icon">✧</span>
         <div class="stat-num" id="stat-servicio">—</div>
         <div class="stat-label">SERVICIO MÁS PEDIDO</div>
       </div>
@@ -572,7 +572,7 @@
 
     banner.innerHTML = `
       <div class="notification-permission-banner">
-        <span>🔔 Habilita notificaciones para recibir alertas de reservas</span>
+        <span>✧ Habilita notificaciones para recibir alertas de reservas</span>
         <button onclick="enableNotifications()">Habilitar</button>
         <button class="close-banner" onclick="this.parentElement.parentElement.style.display='none'">✕</button>
       </div>
@@ -594,7 +594,7 @@
   function sendNotification(titulo, opciones = {}) {
     if ("Notification" in window && Notification.permission === "granted") {
       new Notification(titulo, {
-        icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='80' fill='%23d8c9c0'>💄</text></svg>",
+        icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='80' fill='%23d8c9c0'>❀</text></svg>",
         badge: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23d8c9c0'/></svg>",
         tag: "beauty-studio",
         requireInteraction: true,
@@ -672,7 +672,7 @@
     const reservasHoy = todasLasReservas.filter(r => r.fecha === hoy).sort((a, b) => (a.hora || '').localeCompare(b.hora || ''));
 
     if (reservasHoy.length === 0) {
-      sendNotification("📅 Beauty Studio", { body: "No hay reservas para hoy" });
+      sendNotification("♢ Beauty Studio", { body: "No hay reservas para hoy" });
       return;
     }
 
@@ -683,13 +683,13 @@
     });
 
     const horasStr = Object.keys(horasPorServicio).sort().join(", ");
-    sendNotification(`📅 ${reservasHoy.length} Reserva${reservasHoy.length > 1 ? 's' : ''} hoy`, {
+    sendNotification(`♢ ${reservasHoy.length} Reserva${reservasHoy.length > 1 ? 's' : ''} hoy`, {
       body: `Horas: ${horasStr}`,
       tag: "reservas-hoy"
     });
 
     reservasHoy.forEach(r => {
-      sendNotification(`🕐 ${r.hora} - ${r.nombre}`, {
+      sendNotification(`◷ ${r.hora} - ${r.nombre}`, {
         body: `${r.servicio}`,
         tag: `reserva-${r.id}`
       });
@@ -772,7 +772,7 @@
     const rdias = todasLasReservas.filter(r => r.fecha === fechaStr).sort((a,b) => (a.hora||'').localeCompare(b.hora||''));
 
     if (rdias.length === 0) {
-      contenido.innerHTML = `<div class="empty-day"><span class="icon">🌸</span>Sin reservas para este día</div>`;
+      contenido.innerHTML = `<div class="empty-day"><span class="icon">❀</span>Sin reservas para este día</div>`;
       return;
     }
 
@@ -782,11 +782,11 @@
           <div class="reserva-hora">${r.hora || '--:--'}</div>
           <div class="reserva-nombre">${r.nombre || 'Sin nombre'}</div>
           <div class="reserva-servicio">${r.servicio || ''}</div>
-          <div class="reserva-tel">📞 ${r.telefono || ''}</div>
-          ${r.payment_url ? `<div class="reserva-tel">🔗 <a href="${r.payment_url}" target="_blank" style="color:#c9b5ab;">Link de pago</a></div>` : ''}
+          <div class="reserva-tel">☏ ${r.telefono || ''}</div>
+          ${r.payment_url ? `<div class="reserva-tel">→ <a href="${r.payment_url}" target="_blank" style="color:#c9b5ab;">Link de pago</a></div>` : ''}
         </div>
         <div class="reserva-actions">
-          <span class="badge-pagado ${r.pagado ? 'badge-si' : 'badge-no'}">${r.pagado ? '✓ Pagado' : (r.estado === 'pendiente_pago' ? '⏳ Pago pendiente' : '✗ No pagado')}</span>
+          <span class="badge-pagado ${r.pagado ? 'badge-si' : 'badge-no'}">${r.pagado ? '✓ Pagado' : (r.estado === 'pendiente_pago' ? '◷ Pago pendiente' : '✗ No pagado')}</span>
           <button class="btn-toggle-pago" onclick="togglePago('${r.id}', ${r.pagado}, '${fechaStr}')">
             ${r.pagado ? 'Marcar no pagado' : 'Marcar pagado'}
           </button>
@@ -921,7 +921,7 @@
     tabla.innerHTML = '';
 
     if (todasLasReservas.length === 0) {
-      tabla.innerHTML = `<tr><td colspan="7"><div class="empty-state"><span class="icon">🌸</span>No hay reservas registradas.</div></td></tr>`;
+      tabla.innerHTML = `<tr><td colspan="7"><div class="empty-state"><span class="icon">❀</span>No hay reservas registradas.</div></td></tr>`;
       return;
     }
 

@@ -27,6 +27,7 @@
       font-size: 60px;
       margin-bottom: 18px;
       display: block;
+      color: #d8c9c0;
     }
     .confirmation-icon.spinner {
       width: 44px;
@@ -108,7 +109,7 @@
   </nav>
 
   <a class="whatsapp" href="https://wa.me/56964670007" target="_blank">
-    💬 ESCRÍBEME
+    ♡ ESCRÍBEME
   </a>
 
   <div class="menu-toggle" id="menuToggle">
@@ -123,7 +124,7 @@
     <a href="agenda.html">AGENDAR</a>
     <a href="contacto.html">CONTACTO</a>
     <a class="whatsapp" href="https://wa.me/56964670007" target="_blank">
-      💬 ESCRÍBEME
+      ♡ ESCRÍBEME
     </a>
   </div>
 </header>
@@ -160,7 +161,7 @@
       <div class="footer-divider"></div>
 
       <p class="footer-description">
-        Realzamos tu belleza y potenciamos tu esencia ✨
+        Realzamos tu belleza y potenciamos tu esencia ✧
       </p>
 
       <p class="footer-contact">
@@ -262,7 +263,7 @@
 
   function mostrarPagado(r) {
     estadoPago.innerHTML = `
-      <span class="confirmation-icon">💖</span>
+      <span class="confirmation-icon">♡</span>
       <div class="confirmation-title">¡Reserva confirmada!</div>
       <p class="confirmation-text">
         Recibimos tu anticipo. Tu hora queda reservada y esperamos tu visita.
@@ -279,7 +280,7 @@
 
   function mostrarPendiente() {
     estadoPago.innerHTML = `
-      <span class="confirmation-icon">⏳</span>
+      <span class="confirmation-icon">◷</span>
       <div class="confirmation-title">Tu reserva sigue pendiente</div>
       <p class="confirmation-text">
         Aún no registramos el pago del anticipo.
@@ -292,7 +293,7 @@
   async function consultarEstado() {
     if (!reservaId) {
       estadoPago.innerHTML = `
-        <span class="confirmation-icon">❓</span>
+        <span class="confirmation-icon">?</span>
         <div class="confirmation-title">Datos de pago no encontrados</div>
         <p class="confirmation-text">Revisa el enlace que recibiste e inténtalo nuevamente.</p>
         <a class="confirmation-btn" href="agenda.html">Agendar hora</a>

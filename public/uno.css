@@ -938,95 +938,7 @@ body.preloader-active .hero::before {
   margin-top: 8px;
 }
 
-@media (max-width: 900px) {
-  /* la misma composicion que en escritorio: foto | texto | foto,
-     pero deslizable para que las fotos se vean grandes y legibles */
-  .about-content-wrapper {
-    display: flex;
-    align-items: stretch;
-    gap: 16px;
-    max-width: none;
-    padding: 0 5%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-
-  .about-content-wrapper::-webkit-scrollbar {
-    display: none;
-  }
-
-  .about-media {
-    flex: 0 0 58%;
-    max-width: none;
-    margin: 0;
-  }
-
-  .about-media-der {
-    order: 3;
-  }
-
-  .about-text {
-    order: 2;
-    flex: 0 0 78%;
-    text-align: left;
-    align-self: center;
-  }
-
-  .about-foto {
-    height: 340px;
-  }
-
-  /* pista de que la tira se desliza */
-  .about {
-    position: relative;
-  }
-
-  .about::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 46px;
-    background: linear-gradient(to right, rgba(255, 250, 248, 0), #fffaf8 78%);
-    pointer-events: none;
-    z-index: 5;
-  }
-}
-
-
-
-@media (max-width: 767px) {
-  .about-content-wrapper {
-    gap: 14px;
-    padding: 0 5%;
-  }
-
-  .about-foto {
-    height: 300px;
-    border-radius: 24px;
-  }
-
-  .about-content-wrapper {
-    gap: 12px;
-    padding: 0 4%;
-  }
-
-  .about-media {
-    flex: 0 0 62%;
-  }
-
-  .about-text {
-    flex: 0 0 84%;
-  }
-
-  .about-text p {
-    font-size: 15px;
-    line-height: 1.85;
-  }
-}
+/* Quien soy en celular/tablet: ver bloque "QUIEN SOY EN MOVIL" al final */
 
 /* ============================================
    POR QUÉ ELEGIRNOS
@@ -2917,3 +2829,113 @@ transition:.4s ease;
   }
 }
 
+/* ============================================
+   QUIEN SOY EN MOVIL: una foto que cambia + texto debajo
+   (al final del archivo para ganarle a los bloques responsive antiguos)
+   ============================================ */
+
+@media (max-width: 900px) {
+  .about {
+    padding: 70px 6% 80px;
+    gap: 36px;
+  }
+
+  .about-header h2 {
+    font-size: 44px;
+  }
+
+  .about-divider {
+    margin: 18px auto 0;
+  }
+
+  .about-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 34px;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .about-media-izq {
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+  }
+
+  .about-media-der {
+    display: none;
+  }
+
+  .about-foto {
+    height: auto;
+    aspect-ratio: 4 / 5;
+    border-radius: 28px;
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.09);
+  }
+
+  .about-text {
+    max-width: 100%;
+    margin: 0;
+    text-align: center;
+  }
+
+  .about-text p {
+    font-size: 15.5px;
+    line-height: 1.85;
+    margin-bottom: 16px;
+  }
+
+  .about-text .about-btn {
+    margin-top: 10px;
+    padding: 14px 40px;
+    font-size: 13px;
+  }
+
+  .about::after {
+    display: none;
+  }
+}
+
+@media (max-width: 479px) {
+  .about {
+    padding: 60px 5% 70px;
+    gap: 30px;
+  }
+
+  .about-header h2 {
+    font-size: 38px;
+  }
+
+  .about-media-izq {
+    max-width: 300px;
+  }
+
+  .about-foto {
+    border-radius: 24px;
+  }
+
+  .about-text p {
+    font-size: 15px;
+  }
+}
+
+/* ============================================
+   ICONOS DE LINEA EN ETIQUETAS DE FORMULARIO
+   (reemplazan simbolos que cada celular dibujaba distinto)
+   ============================================ */
+
+.label-ico {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-right: 7px;
+  vertical-align: -3px;
+  fill: none;
+  stroke: #c9b5ab;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

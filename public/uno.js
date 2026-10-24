@@ -123,7 +123,7 @@
     });
   }
 
-  if (window.matchMedia('(max-width: 767px)').matches) {
+  if (window.matchMedia('(max-width: 900px)').matches) {
     const fotos = Array.from(document.querySelectorAll('.about-media-izq .about-foto'));
     if (fotos.length > 1) {
       fotos.forEach((f, i) => f.classList.toggle('is-active', i === 0));

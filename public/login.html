@@ -179,7 +179,10 @@
       border: none;
       cursor: pointer;
       color: #d8c9c0;
-      font-size: 18px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1px;
       padding: 4px;
       transition: 0.2s;
     }
@@ -259,7 +262,7 @@
       <label>Contraseña</label>
       <div class="input-wrapper">
         <input type="password" id="clave" placeholder="Tu contraseña" autocomplete="current-password">
-        <button class="toggle-pass" type="button" onclick="togglePass()" title="Mostrar/ocultar">👁</button>
+        <button class="toggle-pass" type="button" onclick="togglePass()" title="Mostrar contraseña">VER</button>
       </div>
     </div>
 
@@ -271,7 +274,11 @@
   <script>
     function togglePass() {
       const input = document.getElementById("clave");
+      const boton = document.querySelector(".toggle-pass");
       input.type = input.type === "password" ? "text" : "password";
+      const oculta = input.type === "password";
+      boton.textContent = oculta ? "VER" : "OCULTAR";
+      boton.title = oculta ? "Mostrar contraseña" : "Ocultar contraseña";
     }
 
     async function login() {

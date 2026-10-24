@@ -523,23 +523,14 @@ nav a:hover {
   max-width: 560px;
   text-align: center;
   width: 100%;
-  opacity: 0;
-  animation: fadeIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
   position: relative;
   z-index: 3;
 }
 
-/* mientras el preloader esta arriba, el hero espera: asi el sitio aparece
-   en un fundido cruzado y no de golpe */
-
-body.preloader-active .hero-content {
-  opacity: 0;
-  animation: none;
-}
-
-body.preloader-active .hero::before {
-  opacity: 0;
-}
+/* El hero se pinta visible desde el inicio, debajo del preloader:
+   el preloader cubre toda la pantalla y al desvanecerse hace el fundido.
+   (Si el hero empezara transparente, Google mediria la carga recien
+   cuando termina la animacion y el puntaje de rendimiento baja.) */
 
 .butterfly {
   font-size: 58px;

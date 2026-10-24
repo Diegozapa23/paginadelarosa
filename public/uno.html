@@ -19,6 +19,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
   <link rel="stylesheet" href="uno.css"/>
+  <link rel="preload" href="img/mi-trabajo.webp" as="image" fetchpriority="high" />
   <link rel="preload" href="fonts/allura-400-normal.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/cormorant-garamond-var.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/montserrat-var.woff2" as="font" type="font/woff2" crossorigin />
@@ -38,7 +39,7 @@
   </video>
   <div class="preloader-fallback" id="preloaderFallback">
     <div class="preloader-heart">♡</div>
-    <img class="preloader-logo" src="img/logo-wordmark.webp" alt="Beauty Studio De La Rosa" width="620" height="433" />
+    <img class="preloader-logo" src="img/logo-wordmark-500.webp" alt="Beauty Studio De La Rosa" width="500" height="350" />
     <div class="preloader-line"></div>
   </div>
 </div>
@@ -111,8 +112,8 @@
   <div class="about-content-wrapper">
 
       <div class="about-media about-media-izq">
-        <img class="about-foto is-active" src="img/catalina-hero.webp" alt="Catalina - Beauty Studio De La Rosa" width="1080" height="1350" loading="lazy" decoding="async">
-        <img class="about-foto" src="img/catalina-sobre-mi.webp" alt="Catalina - Beauty Studio De La Rosa" width="900" height="1125" loading="lazy" decoding="async">
+        <img class="about-foto is-active" src="img/catalina-hero-640.webp" srcset="img/catalina-hero-640.webp 640w, img/catalina-hero.webp 1080w" sizes="(max-width: 900px) 360px, 320px" alt="Catalina - Beauty Studio De La Rosa" width="640" height="800" loading="lazy" decoding="async">
+        <img class="about-foto" src="img/catalina-sobre-mi-640.webp" srcset="img/catalina-sobre-mi-640.webp 640w, img/catalina-sobre-mi.webp 900w" sizes="(max-width: 900px) 360px, 320px" alt="Catalina - Beauty Studio De La Rosa" width="640" height="800" loading="lazy" decoding="async">
       </div>
 
 <div class="about-text">
@@ -140,8 +141,8 @@
     </div>
 
       <div class="about-media about-media-der">
-        <img class="about-foto" src="img/catalina-hero.webp" alt="Catalina - Beauty Studio De La Rosa" width="1080" height="1350" loading="lazy" decoding="async">
-        <img class="about-foto is-active" src="img/catalina-sobre-mi.webp" alt="Catalina - Beauty Studio De La Rosa" width="900" height="1125" loading="lazy" decoding="async">
+        <img class="about-foto" src="img/catalina-hero-640.webp" srcset="img/catalina-hero-640.webp 640w, img/catalina-hero.webp 1080w" sizes="(max-width: 900px) 360px, 320px" alt="Catalina - Beauty Studio De La Rosa" width="640" height="800" loading="lazy" decoding="async">
+        <img class="about-foto is-active" src="img/catalina-sobre-mi-640.webp" srcset="img/catalina-sobre-mi-640.webp 640w, img/catalina-sobre-mi.webp 900w" sizes="(max-width: 900px) 360px, 320px" alt="Catalina - Beauty Studio De La Rosa" width="640" height="800" loading="lazy" decoding="async">
       </div>
 
     </div></section>
@@ -268,7 +269,7 @@
 
     <div class="footer-brand">
 
-      <img src="img/logo-wordmark-small.webp" alt="Beauty Studio De La Rosa" class="footer-logo" width="430" height="300" loading="lazy">
+      <img src="img/logo-wordmark-320.webp" alt="Beauty Studio De La Rosa" class="footer-logo" width="320" height="224" loading="lazy" decoding="async">
 
       <div class="footer-divider"></div>
 
@@ -309,13 +310,13 @@
           <a class="social-icon"
              href="https://wa.me/56964670007?text=Hola%20quiero%20mas%20informacion%20sobre%20tus%20servicios%20%E2%9D%A4%EF%B8%8F%F0%9F%8C%B9"
              target="_blank">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp">
+            <img src="img/icono-whatsapp.svg" alt="WhatsApp">
           </a>
 
           <a class="social-icon"
              href="https://www.instagram.com/delarosa.studioo/"
              target="_blank">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram">
+            <img src="img/icono-instagram.svg" alt="Instagram">
           </a>
 
         </div>
